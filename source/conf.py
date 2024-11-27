@@ -13,7 +13,7 @@ author = 'writer38'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['recommonmark']
+extensions = ['recommonmark','sphinx_markdown_tables']
 source_suffix=['.rst','.md']
 templates_path = ['_templates']
 exclude_patterns = []

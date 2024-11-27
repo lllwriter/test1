@@ -146,10 +146,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#start-up-process">3.6.1 Start-up Process</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#boot-mode-setup">3.6.2 Boot Mode Setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#serial-terminal-setup">3.6.3 Serial Terminal Setup</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#prototype-operation">3.7 Prototype Operation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#reset-sequence">3.7.1 Reset Sequence</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#booting-os-from-an-sd-card">3.7.2 Booting OS from an SD Card</a></li>
 </ul>
 </li>
@@ -251,23 +247,149 @@
 <section id="project">
 <h3>1.1 Project<a class="headerlink" href="#project" title="Link to this heading"></a></h3>
 <p>Design of a reconfigurable multi-core heterogeneous processor utilising RISC-V architecture.</p>
-<div align=center>  
-<img src="photo/image-7.png" width="500"  alt="UART">      <p>Design Architecture</p>
+<div align="center">  
+<img src="photo/image-7.png"  alt="Design Architecture" width="500px">      <p>Design Architecture</p>
 <div>
 <div align=left><div> <section id="memory-map">
 <h4>Memory Map<a class="headerlink" href="#memory-map" title="Link to this heading"></a></h4>
-<p>Base | Size（B） | Description | Notes|
-:———–: | :———–: | :———–: | :———–:|
-0x0000_0000 | 4K | debug-controller |
-0x0000_3000 | 4K | error-device |
-0x0001_0000 | 8K | Mask ROM (32 KiB) |
-0x0200_0000 | 64K | CLINT |<br />0x0C00_0000 | 4M | PLIC |<br />0x5000_0000 | 0x6000_0000(256M) | PCIE HOST 空间 |<br />0x5000_0000 | 512K | on chip sram |<br />0x5100_0000 | 4K | soc_lsys |<br />0x5200_0000 | 4K | spi_1 |<br />0x6000_0000 | 0x6400_0000 | TIMEOUT |<br />0x20_0000_0000 | 0x20_0800_0000/128M | pci ctrl 空间 timeout |<br />0x20_0800_0000 | 0x20_1000_0000 | TIME_OUT |<br />0x20_1000_0000 | 0x21_000_0000 | TIME_OUT |<br />0x21_0000_0000 | 0x3F_FFFF_FFFF | TIME_OUT |<br />0x6400_0000 | 4K | serial | 不支持narrow，sparse
-0x6400_1000 | 4K | spi_0 | 不支持narrow，sparse
-0x6400_2000 | 4K | gpio | 不支持narrow，sparse
-0x8000_0000 | 512M | CHIPLINK |
-0xA000_0000 | 512M | DDR（SDRAM） |<br />0xC000_0000 | 1G | TIME_OUT | 注意到这段空间不允许访问，访问会导致总线挂死
-MIG_CHIPLINK_SLAVE | 1 MIG真实空间0x8000_0000 - 0xC000_0000可remap到如下空间：0x1000_<em>0000 - 0xE000_0000</em>（13*256=3328M） | 1 slave口需要地址remap，最高4bit可以控制，连接到SOC_LSYS，默认最高4bit改成1 | 集成chiplink到meishav100版本，用于后续验证<a class="reference external" href="https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail">https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail</a></p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Base</th>
+<th style="text-align: center;">Size（B）</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x0000_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">debug-controller</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0000_3000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">error-device</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0001_0000</td>
+<td style="text-align: center;">8K</td>
+<td style="text-align: center;">Mask ROM (32 KiB)</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0200_0000</td>
+<td style="text-align: center;">64K</td>
+<td style="text-align: center;">CLINT</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0C00_0000</td>
+<td style="text-align: center;">4M</td>
+<td style="text-align: center;">PLIC</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5000_0000</td>
+<td style="text-align: center;">0x6000_0000(256M)</td>
+<td style="text-align: center;">PCIE HOST 空间</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5000_0000</td>
+<td style="text-align: center;">512K</td>
+<td style="text-align: center;">on chip sram</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5100_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">soc_lsys</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5200_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">spi_1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6000_0000</td>
+<td style="text-align: center;">0x6400_0000</td>
+<td style="text-align: center;">TIMEOUT</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x20_0000_0000</td>
+<td style="text-align: center;">0x20_0800_0000/128M</td>
+<td style="text-align: center;">pci ctrl 空间 timeout</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x20_0800_0000</td>
+<td style="text-align: center;">0x20_1000_0000</td>
+<td style="text-align: center;">TIME_OUT</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x20_1000_0000</td>
+<td style="text-align: center;">0x21_000_0000</td>
+<td style="text-align: center;">TIME_OUT</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x21_0000_0000</td>
+<td style="text-align: center;">0x3F_FFFF_FFFF</td>
+<td style="text-align: center;">TIME_OUT</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">serial</td>
+<td style="text-align: center;">不支持narrow，sparse</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_1000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">spi_0</td>
+<td style="text-align: center;">不支持narrow，sparse</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_2000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">gpio</td>
+<td style="text-align: center;">不支持narrow，sparse</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x8000_0000</td>
+<td style="text-align: center;">512M</td>
+<td style="text-align: center;">CHIPLINK</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0xA000_0000</td>
+<td style="text-align: center;">512M</td>
+<td style="text-align: center;">DDR（SDRAM）</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0xC000_0000</td>
+<td style="text-align: center;">1G</td>
+<td style="text-align: center;">TIME_OUT</td>
+<td style="text-align: center;">注意到这段空间不允许访问，访问会导致总线挂死</td>
+</tr>
+<tr>
+<td style="text-align: center;">MIG_CHIPLINK_SLAVE</td>
+<td style="text-align: center;">MIG真实空间0x8000_0000 - 0xC000_0000可remap到如下空间：0x1000_<em>0000 - 0xE000_0000</em>（13*256=3328M）</td>
+<td style="text-align: center;">slave口需要地址remap，最高4bit可以控制，连接到SOC_LSYS，默认最高4bit改成1</td>
+<td style="text-align: center;">集成chiplink到meishav100版本，用于后续验证<a href="https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail">https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail</a></td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="background">
 <h3>1.2 Background<a class="headerlink" href="#background" title="Link to this heading"></a></h3>
@@ -287,14 +409,40 @@ MIG_CHIPLINK_SLAVE | 1 MIG真实空间0x8000_0000 - 0xC000_0000可remap到如下
 Completion
 <div>
 <div align=left><div>        <p>The table below provides a list of the hardware modules we currently possess:</p>
-<p>| Design | Spec Version |
-| :—: | :—: |
-| GPIO | 1.1.0 |
-| SPI | 1.1.0 |
-| QSPI | 1.1.0 |
-| UART | 1.1.0 |
-| JTAG | 1.1.0|<br />|SRAM|1.1.0|</p>
-<ul class="simple">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Design</th>
+<th style="text-align: center;">Spec Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">GPIO</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">SPI</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">QSPI</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">UART</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">JTAG</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">SRAM</td>
+<td style="text-align: center;">1.1.0</td>
+</tr>
+</tbody>
+</table><ul class="simple">
 <li><p>The chip incorporates GPIO peripherals, which facilitate bidirectional communication with the external environment.</p></li>
 <li><p>The chip features two SPIs and one QSPI, supporting both single-wire and four-wire modes, and is employed for communication with external devices, such as SD cards.</p></li>
 <li><p>The chip includes a UART peripheral, which implements dual-lane full-duplex UART functionality.</p></li>
@@ -542,8 +690,29 @@ After the configuration, the TL-agent writes the generated data to <code class="
 </section>
 <section id="hardware-interfaces">
 <h4>2.2.4 Hardware Interfaces<a class="headerlink" href="#hardware-interfaces" title="Link to this heading"></a></h4>
-<p>The following table shows the uart connection method:<br />|Master_Port|Slave_Port|<br />|:-:|:-:|<br />|Master_Tx|Slave_Rx|<br />|Master_Rx|Slave_Tx|<br />|GND|GND|</p>
-<p>The following diagram shows the system block diagram of UART：</p>
+<p>The following table shows the uart connection method:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Master_Port</th>
+<th style="text-align: center;">Slave_Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Master_Tx</td>
+<td style="text-align: center;">Slave_Rx</td>
+</tr>
+<tr>
+<td style="text-align: center;">Master_Rx</td>
+<td style="text-align: center;">Slave_Tx</td>
+</tr>
+<tr>
+<td style="text-align: center;">GND</td>
+<td style="text-align: center;">GND</td>
+</tr>
+</tbody>
+</table><p>The following diagram shows the system block diagram of UART：</p>
 <div align=center><img src="photo/image-1.png" width="280"  alt="2">  <p>Block Diagram</p>
 <div>
 <div align=left><div>   </section>
@@ -551,64 +720,262 @@ After the configuration, the TL-agent writes the generated data to <code class="
 <h4>2.2.5 Registers<a class="headerlink" href="#registers" title="Link to this heading"></a></h4>
 <section id="control-register">
 <h5>Control Register<a class="headerlink" href="#control-register" title="Link to this heading"></a></h5>
-<p>A serial port control register is a specialized type of register within communication interfaces, responsible for managing the configuration and control of serial communication lines. These registers are essential for facilitating and overseeing data transfers between devices that employ serial communication protocols.
-offset | Name | Description
-:———–: | :———–: | :———–:|
-0x00 | txdata | Transmit data register
-0x04 | rxdata | Receiver data register
-0x08 | txctrl | Transmit control register
-0x0C | rxctrl | Receive control register
-0X10 | ie | UART interrupt enable
-0X14 | ip | UART interrupt pending
-0X18 | div | Baud rate divisor</p>
-<p>The functions typically managed by these registers include:</p>
+<p>A serial port control register is a specialized type of register within communication interfaces, responsible for managing the configuration and control of serial communication lines. These registers are essential for facilitating and overseeing data transfers between devices that employ serial communication protocols.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">offset</th>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">txdata</td>
+<td style="text-align: center;">Transmit data register</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x04</td>
+<td style="text-align: center;">rxdata</td>
+<td style="text-align: center;">Receiver data register</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x08</td>
+<td style="text-align: center;">txctrl</td>
+<td style="text-align: center;">Transmit control register</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0C</td>
+<td style="text-align: center;">rxctrl</td>
+<td style="text-align: center;">Receive control register</td>
+</tr>
+<tr>
+<td style="text-align: center;">0X10</td>
+<td style="text-align: center;">ie</td>
+<td style="text-align: center;">UART interrupt enable</td>
+</tr>
+<tr>
+<td style="text-align: center;">0X14</td>
+<td style="text-align: center;">ip</td>
+<td style="text-align: center;">UART interrupt pending</td>
+</tr>
+<tr>
+<td style="text-align: center;">0X18</td>
+<td style="text-align: center;">div</td>
+<td style="text-align: center;">Baud rate divisor</td>
+</tr>
+</tbody>
+</table><p>The functions typically managed by these registers include:</p>
 </section>
 <section id="baud-rate-divisor-register-div">
 <h5>Baud Rate Divisor Register(div)<a class="headerlink" href="#baud-rate-divisor-register-div" title="Link to this heading"></a></h5>
 <p>It determines the speed of data transmission in bits per second (baud). The div register designates the divisor employed for the baud rate generation of the Tx and Rx channels. The input clock is derived from the bus clock. The reset value of the register is configured to div_init, and, given the anticipated frequency of the tlclk, it is calibrated to yield a 115200 baud output upon reset.</p>
-<p>|tlclk (MHz) | Target Baud (Hz) | Divisor | Actual Baud (Hz) | Error (%)|<br />|:———–:| :———–: | :———–:| :———–:| :———–:
-|500 | 31250 | 16000 | 31250 | 0|<br />|500 | 115200 | 4340 | 115207 | 0.0064|
-|500 | 250000 | 2000 | 250000 | 0|
-|500 | 1843200 | 271 | 1845018 | 0.099|
-|750 | 31250 | 24000 | 31250 | 0|
-|750 | 115200 | 6510 | 6510 | 0.0064|
-|750 | 250000 | 3000 | 3000 | 0|
-|750 | 1843200 | 407 | 407 | 0.024 |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">tlclk (MHz)</th>
+<th style="text-align: center;">Target Baud (Hz)</th>
+<th style="text-align: center;">Divisor</th>
+<th style="text-align: center;">Actual Baud (Hz)</th>
+<th style="text-align: center;">Error (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">31250</td>
+<td style="text-align: center;">16000</td>
+<td style="text-align: center;">31250</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">115200</td>
+<td style="text-align: center;">4340</td>
+<td style="text-align: center;">115207</td>
+<td style="text-align: center;">0.0064</td>
+</tr>
+<tr>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">250000</td>
+<td style="text-align: center;">2000</td>
+<td style="text-align: center;">250000</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">1843200</td>
+<td style="text-align: center;">271</td>
+<td style="text-align: center;">1845018</td>
+<td style="text-align: center;">0.099</td>
+</tr>
+<tr>
+<td style="text-align: center;">750</td>
+<td style="text-align: center;">31250</td>
+<td style="text-align: center;">24000</td>
+<td style="text-align: center;">31250</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">750</td>
+<td style="text-align: center;">115200</td>
+<td style="text-align: center;">6510</td>
+<td style="text-align: center;">6510</td>
+<td style="text-align: center;">0.0064</td>
+</tr>
+<tr>
+<td style="text-align: center;">750</td>
+<td style="text-align: center;">250000</td>
+<td style="text-align: center;">3000</td>
+<td style="text-align: center;">3000</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">750</td>
+<td style="text-align: center;">1843200</td>
+<td style="text-align: center;">407</td>
+<td style="text-align: center;">407</td>
+<td style="text-align: center;">0.024</td>
+</tr>
+</tbody>
+</table></section>
 <section id="transmit-data-register-txdata">
 <h5>Transmit Data Register (txdata)<a class="headerlink" href="#transmit-data-register-txdata" title="Link to this heading"></a></h5>
-<p>If the FIFO is capable of accepting a new entry, then writing to the txdata register queues the characters contained within the data field to the transmitting FIFO. Reading from txdata returns the current value of the full flag and sets the data field to zero. The full flag signifies whether the transmitting FIFO can accommodate the new entry. Post-setting, writes to the data field are disregarded.
-<strong>Bits</strong> | <strong>Field Name</strong> | <strong>Attr.</strong>
-:———–: | :———–: | :———–:
-[7:0] | data | RW
-[30:8] | Reserved |<br />31 | full | RO</p>
-</section>
+<p>If the FIFO is capable of accepting a new entry, then writing to the txdata register queues the characters contained within the data field to the transmitting FIFO. Reading from txdata returns the current value of the full flag and sets the data field to zero. The full flag signifies whether the transmitting FIFO can accommodate the new entry. Post-setting, writes to the data field are disregarded.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Bits</strong></th>
+<th style="text-align: center;"><strong>Field Name</strong></th>
+<th style="text-align: center;"><strong>Attr.</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;">RW</td>
+</tr>
+<tr>
+<td style="text-align: center;">[30:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">full</td>
+<td style="text-align: center;">RO</td>
+</tr>
+</tbody>
+</table></section>
 <section id="receive-data-register-rxdata">
 <h5>Receive Data Register (rxdata)<a class="headerlink" href="#receive-data-register-rxdata" title="Link to this heading"></a></h5>
 <p>The read rxdata register extracts a character from the received FIFO and returns its value in the data field. The empty flag indicates whether the received FIFO is devoid of contents. Upon being set, the data field does not contain valid characters. Writes to rxdata are ignored.</p>
-<p><strong>Bits</strong> | <strong>Field Name</strong> | <strong>Attr.</strong>
-:———–: | :———–: | :———–:
-[7:0] | data | RW
-[30:8] | Reserved |<br />31 | full | RO</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Bits</strong></th>
+<th style="text-align: center;"><strong>Field Name</strong></th>
+<th style="text-align: center;"><strong>Attr.</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;">RW</td>
+</tr>
+<tr>
+<td style="text-align: center;">[30:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">full</td>
+<td style="text-align: center;">RO</td>
+</tr>
+</tbody>
+</table></section>
 <section id="interrupt-registers-ip-and-ie">
 <h5>Interrupt Registers (ip and ie)<a class="headerlink" href="#interrupt-registers-ip-and-ie" title="Link to this heading"></a></h5>
-<p>The ip register is a read-only register that indicates pending interrupt conditions, while the read-write ie register controls which UART interrupts are enabled. ie was reset to 0.
-<strong>Bits</strong> | <strong>Field Name</strong> | <strong>Attr.</strong><br />:———–: | :———–: | :———–:<br />0 | txwm | RW<br />1 | rxwm | RW<br />[31:2] | Reserved |</p>
-</section>
+<p>The ip register is a read-only register that indicates pending interrupt conditions, while the read-write ie register controls which UART interrupts are enabled. ie was reset to 0.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Bits</strong></th>
+<th style="text-align: center;"><strong>Field Name</strong></th>
+<th style="text-align: center;"><strong>Attr.</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">txwm</td>
+<td style="text-align: center;">RW</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">rxwm</td>
+<td style="text-align: center;">RW</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:2]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="checklist">
 <h4>2.2.6 Checklist<a class="headerlink" href="#checklist" title="Link to this heading"></a></h4>
 <section id="design-checklist">
 <h5>Design Checklist<a class="headerlink" href="#design-checklist" title="Link to this heading"></a></h5>
-<p>|Type|Item|Resolution|<br />|:-:|:-:|:-:|
-|Documentation|UART SPEC|Done|<br />|RTL|Design|Done|</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Item</th>
+<th style="text-align: center;">Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Documentation</td>
+<td style="text-align: center;">UART SPEC</td>
+<td style="text-align: center;">Done</td>
+</tr>
+<tr>
+<td style="text-align: center;">RTL</td>
+<td style="text-align: center;">Design</td>
+<td style="text-align: center;">Done</td>
+</tr>
+</tbody>
+</table></section>
 <section id="verification-checklist">
 <h5>Verification Checklist<a class="headerlink" href="#verification-checklist" title="Link to this heading"></a></h5>
-<p>|Type|Item|Resolution|<br />|:-:|:-:|:-:|
-|Documentation|VIP|Done|<br />|RTL|Design|Done|</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Item</th>
+<th style="text-align: center;">Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Documentation</td>
+<td style="text-align: center;">VIP</td>
+<td style="text-align: center;">Done</td>
+</tr>
+<tr>
+<td style="text-align: center;">RTL</td>
+<td style="text-align: center;">Design</td>
+<td style="text-align: center;">Done</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 </section>
 <section id="spi">
@@ -781,13 +1148,37 @@ offset | Name | Description
 <section id="hardware-interface">
 <h4>2.3.3 Hardware Interface<a class="headerlink" href="#hardware-interface" title="Link to this heading"></a></h4>
 <p>Within the U500 platform, only a single SPI (SPI0) interface is presently available, specifically designated for connecting to an SD card. The top-level module delineates the following correspondence between the SPI interface signals and the SD card signals:</p>
-<p>| SPI Signal | Top-level SD Card Signal | I/O   |
-|:————:|:————————-:|:——-:|
-| SCK        | sdio_sdio_clk           | output |
-| MOSI       | sdio_sdio_cmd           | output |
-| MISO       | sdio_sdio_dat_0         | input  |
-| CS         | sdio_sdio_dat_3         | output |</p>
-<section id="detailed-explanation">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">SPI Signal</th>
+<th style="text-align: center;">Top-level SD Card Signal</th>
+<th style="text-align: center;">I/O</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">SCK</td>
+<td style="text-align: center;">sdio_sdio_clk</td>
+<td style="text-align: center;">output</td>
+</tr>
+<tr>
+<td style="text-align: center;">MOSI</td>
+<td style="text-align: center;">sdio_sdio_cmd</td>
+<td style="text-align: center;">output</td>
+</tr>
+<tr>
+<td style="text-align: center;">MISO</td>
+<td style="text-align: center;">sdio_sdio_dat_0</td>
+<td style="text-align: center;">input</td>
+</tr>
+<tr>
+<td style="text-align: center;">CS</td>
+<td style="text-align: center;">sdio_sdio_dat_3</td>
+<td style="text-align: center;">output</td>
+</tr>
+</tbody>
+</table><section id="detailed-explanation">
 <h5>Detailed Explanation:<a class="headerlink" href="#detailed-explanation" title="Link to this heading"></a></h5>
 <ul class="simple">
 <li><p><strong>SCK (Serial Clock)</strong>: The SPI clock signal, utilized for synchronizing data transmission, corresponds to the <code class="docutils literal notranslate"><span class="pre">sdio_sdio_clk</span></code> signal at the top-level module and is an output signal.</p></li>
@@ -801,25 +1192,122 @@ offset | Name | Description
 <h4>2.3.4 Registers<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
 <section id="controller-memory-map-configuration">
 <h5>Controller Memory Map Configuration<a class="headerlink" href="#controller-memory-map-configuration" title="Link to this heading"></a></h5>
-<p>Offset | Name | Description
-:———–: | :———–: | :———–:
-0x00 | sckdiv | Serial clock divisor
-0x04 | sckmode | Serial clock mode
-0x10 | csid | Chip select ID
-0x14 | csdef | Chip select default
-0x18 | csmode | Chip select mode
-0x28 | delay0 | Delay control 0
-0x2c | delay1 | Delay control 1
-0x38 | extradel |<br />0x3c | sampledel |<br />|   |<br />0x40 | fmt | Frame format
-0x48 | txfifo | Tx FIFO data
-0x4c | rxfifo | Rx FIFO data
-0x50 | txmark | Tx FIFO watermark
-0x54 | rxmark | Rx FIFO watermark
-|   |<br />0x60 | fctrl | SPI flash interface control
-0x64 | ffmt | SPI flash instruction format
-|   |<br />0x70 | ie | SPI interrupt enable
-0x74 | ip | SPI interrupt pending</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Offset</th>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">sckdiv</td>
+<td style="text-align: center;">Serial clock divisor</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x04</td>
+<td style="text-align: center;">sckmode</td>
+<td style="text-align: center;">Serial clock mode</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x10</td>
+<td style="text-align: center;">csid</td>
+<td style="text-align: center;">Chip select ID</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x14</td>
+<td style="text-align: center;">csdef</td>
+<td style="text-align: center;">Chip select default</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x18</td>
+<td style="text-align: center;">csmode</td>
+<td style="text-align: center;">Chip select mode</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x28</td>
+<td style="text-align: center;">delay0</td>
+<td style="text-align: center;">Delay control 0</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x2c</td>
+<td style="text-align: center;">delay1</td>
+<td style="text-align: center;">Delay control 1</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x38</td>
+<td style="text-align: center;">extradel</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3c</td>
+<td style="text-align: center;">sampledel</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x40</td>
+<td style="text-align: center;">fmt</td>
+<td style="text-align: center;">Frame format</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x48</td>
+<td style="text-align: center;">txfifo</td>
+<td style="text-align: center;">Tx FIFO data</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x4c</td>
+<td style="text-align: center;">rxfifo</td>
+<td style="text-align: center;">Rx FIFO data</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x50</td>
+<td style="text-align: center;">txmark</td>
+<td style="text-align: center;">Tx FIFO watermark</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x54</td>
+<td style="text-align: center;">rxmark</td>
+<td style="text-align: center;">Rx FIFO watermark</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x60</td>
+<td style="text-align: center;">fctrl</td>
+<td style="text-align: center;">SPI flash interface control</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x64</td>
+<td style="text-align: center;">ffmt</td>
+<td style="text-align: center;">SPI flash instruction format</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x70</td>
+<td style="text-align: center;">ie</td>
+<td style="text-align: center;">SPI interrupt enable</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x74</td>
+<td style="text-align: center;">ip</td>
+<td style="text-align: center;">SPI interrupt pending</td>
+</tr>
+</tbody>
+</table></section>
 <section id="register-functionality-overview">
 <h5>Register Functionality Overview<a class="headerlink" href="#register-functionality-overview" title="Link to this heading"></a></h5>
 <section id="sckdiv">
@@ -829,45 +1317,156 @@ $$f_{sck}=\frac{f_{in}}{2(div+1)}$$</p>
 <p>The input clock is the bus clock tlclk. The div field is reset to the value 0x3.</p>
 <p>Alternatively, for a more detailed context:</p>
 <p>The input clock is synchronized with the bus clock, denoted as tlclk. The div field within the sckdiv register, which governs the division factor for SCK generation, is initialized to a default value of 0x3 upon reset.</p>
-<p>Bits | Fidle Name | Attr. | Rst. | Description
-:———–: | :———–: | :———–: | :———–: | :———–:
-[11:0] | div | RW | 0x3 | Divisor or serial clock
-[31:12] | Reserved | RW | X | Reserved</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[11:0]</td>
+<td style="text-align: center;">div</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x3</td>
+<td style="text-align: center;">Divisor or serial clock</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:12]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 <section id="seral-clock-mode-register-sckmode">
 <h6>Seral Clock Mode Register (sckmode)<a class="headerlink" href="#seral-clock-mode-register-sckmode" title="Link to this heading"></a></h6>
 <p>The sckmode register dictates the polarity and phase attributes of the serial clock. Upon reset, the sckmode register is initialized to a default value of 0.</p>
-<p>Bits | Fidle Name | Attr. | Rst. | Description
-:–: | :–: | :–: | :–: | :–:
-0 | pha | RW | 0x0 | Serial clock phase
-1 | pol | RW | 0x0 | Serial clock polarity
-[31:2] | Reserved | RW | X | Reserved</p>
-<p>Serial Clock Polarity:
-Value | Description |
-:–: | :–: |
-0 | The SCK signal remains at a logical level of 0 at idle|
-1 |The SCK signal remains at a logical level of 1
-at idle|</p>
-<p>Serial Clock Phase：
-Value | Description |
-:–: | :–: |
-0 | Data is sampled on the rising edge of SCK (leading edge) and shifted out on the falling edge of SCK (trailing edge) |
-1 | Data is sampled on the falling edge of SCK (leading edge) and shifted out on the rising edge of SCK (trailing edge)|</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">pha</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Serial clock phase</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">pol</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Serial clock polarity</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:2]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table><p>Serial Clock Polarity:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">The SCK signal remains at a logical level of 0 at idle</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">The SCK signal remains at a logical level of 1</td>
+</tr>
+<tr>
+<td style="text-align: center;">at idle</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table><p>Serial Clock Phase：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Data is sampled on the rising edge of SCK (leading edge) and shifted out on the falling edge of SCK (trailing edge)</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Data is sampled on the falling edge of SCK (leading edge) and shifted out on the rising edge of SCK (trailing edge)</td>
+</tr>
+</tbody>
+</table></section>
 <section id="chip-select-id-register-csid">
 <h6>Chip Select ID Register (csid)<a class="headerlink" href="#chip-select-id-register-csid" title="Link to this heading"></a></h6>
 <p>The csid register encodes the index of the CS pin to be toggled by the hardware chip select control. The reset value for this register is 0.</p>
-<p>Bits | Fidle Name | Attr. | Rst. | Description |
-:–: | :–: | :–: | :–: | :–: |
-[31:0] | csid | RW | 0x0000_0000 | Chip Select ID |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[31:0]</td>
+<td style="text-align: center;">csid</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0000_0000</td>
+<td style="text-align: center;">Chip Select ID</td>
+</tr>
+</tbody>
+</table></section>
 <section id="chip-select-default-register-csdef">
 <h6>Chip Select Default Register (csdef)<a class="headerlink" href="#chip-select-default-register-csdef" title="Link to this heading"></a></h6>
-<p>The csdef register specifies the idle state (polarity) of the CS pins. For all implemented CS pins, the reset value is set to high.
-Bits | Fidle Name | Attr. | Rst. | Description |
-:–: | :–: | :–: | :–: | :–: |
-[31:0] | csdef | RW | 0x0000_0001 | Chip Select Default Value |</p>
-</section>
+<p>The csdef register specifies the idle state (polarity) of the CS pins. For all implemented CS pins, the reset value is set to high.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[31:0]</td>
+<td style="text-align: center;">csdef</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0000_0001</td>
+<td style="text-align: center;">Chip Select Default Value</td>
+</tr>
+</tbody>
+</table></section>
 <section id="chip-select-mode-register-csmode">
 <h6>Chip Select Mode Register (csmode)<a class="headerlink" href="#chip-select-mode-register-csmode" title="Link to this heading"></a></h6>
 <p>The csmode register defines the behavior of the hardware chip select, as detailed in the table below. The reset value is 0 (AUTO). In HOLD mode, the CS pin remains deasserted under the following conditions:</p>
@@ -876,16 +1475,58 @@ Bits | Fidle Name | Attr. | Rst. | Description |
 <li><p>A write to csdef results in a change of state for the selected pin.</p></li>
 <li><p>Direct-mapped flash mode is enabled.</p></li>
 </ul>
-<p>Bits | Fidle Name | Attr. | Rst. | Description
-:———–: | :———–: | :———–: | :———–: | :———–:
-[1:0] | mode | RW | X | Chip Select Mode
-[31:2] | Reserved | RW | X | Reserved</p>
-<p>Value | Name | Description
-:———–: | :———–: | :———–:
-0 | AUTO | Toggle the CS signal at the beginning/end of each frame
-2 | HOLD |Keep the CS signal asserted continuously after the initial frame
-3 | OFF | Disable hardware control over the CS signal</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[1:0]</td>
+<td style="text-align: center;">mode</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Chip Select Mode</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:2]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">AUTO</td>
+<td style="text-align: center;">Toggle the CS signal at the beginning/end of each frame</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">HOLD</td>
+<td style="text-align: center;">Keep the CS signal asserted continuously after the initial frame</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">OFF</td>
+<td style="text-align: center;">Disable hardware control over the CS signal</td>
+</tr>
+</tbody>
+</table></section>
 <section id="delay-control-registers-delay0-and-delay1">
 <h6>Delay Control Registers (delay0 and delay1)<a class="headerlink" href="#delay-control-registers-delay0-and-delay1" title="Link to this heading"></a></h6>
 <p>The delay0 and delay1 registers allow the insertion of arbitrary delays in terms of SCK cycles.</p>
@@ -895,21 +1536,89 @@ Bits | Fidle Name | Attr. | Rst. | Description |
 <li><p>The intercs field specifies the minimum CS idle time between deassertion and reassertion. The reset value is 0x01.</p></li>
 <li><p>The interxfr field specifies the delay between two consecutive frames without deasserting CS. This is applicable only when sckmode is in HOLD or OFF. The reset value is 0x00.</p></li>
 </ul>
-<p>delay0：
-Bits | Fidle Name | Attr. | Rst. | Description |
-:–: | :–: | :–: | :–: | :–: |
-[7:0] | cssck | RW | 0x01 | CS to SCK Delay |
-[15:8] | Reserved | RW | X | Reserved |
-[23:16] | sckcs | RW | 0x01 | SCK to CS Delay |
-[31:24] | Reserved | RW | X | Reserved |</p>
-<p>delya1：
-Bits | Fidle Name | Attr. | Rst. | Description |
-:–: | :–: | :–: | :–: | :–: |
-[7:0] | intercs | RW | 0x01 | Minimum CS inactive time |
-[15:8] | Reserved | RW | X | Reserved |
-[23:16] | interxfr | RW | 0x00 | Maximum interframe delay |
-[31:24] | Reserved | RW | X | Reserved |</p>
-</section>
+<p>delay0：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">cssck</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x01</td>
+<td style="text-align: center;">CS to SCK Delay</td>
+</tr>
+<tr>
+<td style="text-align: center;">[15:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">[23:16]</td>
+<td style="text-align: center;">sckcs</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x01</td>
+<td style="text-align: center;">SCK to CS Delay</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:24]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table><p>delya1：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">intercs</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x01</td>
+<td style="text-align: center;">Minimum CS inactive time</td>
+</tr>
+<tr>
+<td style="text-align: center;">[15:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">[23:16]</td>
+<td style="text-align: center;">interxfr</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">Maximum interframe delay</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:24]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 <section id="frame-format-register-fmt">
 <h6>Frame Format Register (fmt)<a class="headerlink" href="#frame-format-register-fmt" title="Link to this heading"></a></h6>
 <p>The fmt register defines the frame format for transfers initiated via the Programmed I/O (FIFO) interface. The following table describes the proto, endian, and dir fields, which represent the protocol, endianness, and direction, respectively.</p>
@@ -918,112 +1627,446 @@ Bits | Fidle Name | Attr. | Rst. | Description |
 <li><p>For SPI0, the reset value of the fmt register is 0x0008 0008, which corresponds to proto = single, dir = Tx, endian = MSB, and len = 8.</p></li>
 <li><p>For SPI1 and SPI2, the reset value of the fmt register is 0x0008 0000, which corresponds to proto = single, dir = Rx, endian = MSB, and len = 8.</p></li>
 </ul>
-<p>Bits | Fidle Name | Attr. | Rst. | Description
-:———–: | :———–: | :———–: | :———–: | :———–:
-[1:0] | proto | RW | 0x0 | SPI Protocol
-2 | endian | RW | 0x0 | SPI endinanness
-3 | dir | RW | 0x1 | SPI I/O Direction
-[15:4] | Reserved | RW | X | Reserved
-[19:16] | len | RW | 0x8 | Number of bits per frame
-[31:20] | Reserved | RW | X | Reserved</p>
-<p>SPI Protocol：
-Value | Description | Data Pins |
-:–: | :–: |:–: |
-0 | Single | DQ0(MOSI), DQ1(MISO) |
-1 | Dual | DQ0, DQ1|
-2 | Quad | DQ0, DQ1, DQ2, DQ3 |</p>
-<p>SPI Endianness：
-Value | Description |
-:–: | :–: |
-0 | Transmit most-significant bit (MSB) first |
-1 | Transmit least-significant bit (LSB) first |</p>
-<p>SPI I/O Direction：</p>
-<p>| Value | Description |
-|:——-:|:————-:|
-| 0     | Rx: In dual and quad protocols, the DQ pins are tri-stated. In the single protocol, the DQ0 pin is driven by the transmit data as usual. |
-| 1     | Tx: Receive data is not stored in the receive FIFO. |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Fidle Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[1:0]</td>
+<td style="text-align: center;">proto</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">SPI Protocol</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">endian</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">SPI endinanness</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">dir</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x1</td>
+<td style="text-align: center;">SPI I/O Direction</td>
+</tr>
+<tr>
+<td style="text-align: center;">[15:4]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">[19:16]</td>
+<td style="text-align: center;">len</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x8</td>
+<td style="text-align: center;">Number of bits per frame</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:20]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table><p>SPI Protocol：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Data Pins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Single</td>
+<td style="text-align: center;">DQ0(MOSI), DQ1(MISO)</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Dual</td>
+<td style="text-align: center;">DQ0, DQ1</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">Quad</td>
+<td style="text-align: center;">DQ0, DQ1, DQ2, DQ3</td>
+</tr>
+</tbody>
+</table><p>SPI Endianness：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Transmit most-significant bit (MSB) first</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Transmit least-significant bit (LSB) first</td>
+</tr>
+</tbody>
+</table><p>SPI I/O Direction：</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Rx: In dual and quad protocols, the DQ pins are tri-stated. In the single protocol, the DQ0 pin is driven by the transmit data as usual.</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Tx: Receive data is not stored in the receive FIFO.</td>
+</tr>
+</tbody>
+</table></section>
 <section id="id18">
 <h6>Transmit Data Register (txdata)<a class="headerlink" href="#id18" title="Link to this heading"></a></h6>
 <p>Writing to the txdata register loads the transmit FIFO with the value in the data field.</p>
 <p>For the case where fmt.len &lt; 8, the value should be left-aligned when fmt.endian = MSB, and right-aligned when fmt.endian = LSB.</p>
 <p>The full flag is set when the transmit FIFO is ready to accept a new entry; when set, writes to txdata are ignored. On read, the data field returns 0x00.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| [7:0] | data | RW | 0x00 | Transmit Data |
-| [30:8] | Reserved | RW | X | Reserved |
-| 31 | full | RO | X | FIFO full flag |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">Transmit Data</td>
+</tr>
+<tr>
+<td style="text-align: center;">[30:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">full</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">FIFO full flag</td>
+</tr>
+</tbody>
+</table></section>
 <section id="id19">
 <h6>Receive Data Register (rxdata)<a class="headerlink" href="#id19" title="Link to this heading"></a></h6>
 <p>Reading the rxdata register dequeues a frame from the receive FIFO.</p>
 <p>For the case where fmt.len &lt; 8, the value should be left-aligned when fmt.endian = MSB, and right-aligned when fmt.endian = LSB.</p>
 <p>The empty flag is set when the receive FIFO contains a new entry available for reading; when set, the data field does not contain a valid frame. Writes to rxdata are ignored.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| [7:0] | data | RO | X | Received Data |
-| [30:8] | Reserved | RO | X | Reserved |
-| 31 | empty | RO | X | FIFO empty flag |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[7:0]</td>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Received Data</td>
+</tr>
+<tr>
+<td style="text-align: center;">[30:8]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">empty</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">FIFO empty flag</td>
+</tr>
+</tbody>
+</table></section>
 <section id="transmit-watermark-register-txmark">
 <h6>Transmit Watermark Register (txmark)<a class="headerlink" href="#transmit-watermark-register-txmark" title="Link to this heading"></a></h6>
 <p>The txmark register specifies the threshold that triggers the Tx FIFO watermark interrupt.
 For spi0, the reset value is 1; for spi1 and spi2, the reset value is 0.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| [2:0] | txmark | RW | 0x1 | Transmit watermark |
-| [31:3] | Reserved | RW | X | Reserved |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[2:0]</td>
+<td style="text-align: center;">txmark</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x1</td>
+<td style="text-align: center;">Transmit watermark</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:3]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 <section id="receive-watermark-register-rxmark">
 <h6>Receive Watermark Register (rxmark)<a class="headerlink" href="#receive-watermark-register-rxmark" title="Link to this heading"></a></h6>
 <p>The rxmark specifies the threshold that triggers the Rx FIFO watermark interrupt. The reset value is 0.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| [2:0] | rxmark | RW | 0x0 | Receive watermark |
-| [31:3] | Reserved | RW | X | Reserved |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">[2:0]</td>
+<td style="text-align: center;">rxmark</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Receive watermark</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:3]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 <section id="spi-flash-interface-control-register-fctrl">
 <h6>SPI Flash Interface Control Register (fctrl)<a class="headerlink" href="#spi-flash-interface-control-register-fctrl" title="Link to this heading"></a></h6>
 <p>When the en bit of the fctrl register is set, the controller enters SPI Flash mode. Access to the memory-mapped region will cause the controller to automatically perform SPI Flash read sequences in hardware. The reset value is 0x1.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| 0 | en | RW | 0x1 | SPI Flash Mode Select |
-| [31:1] | Reserved | RW | X | Reserved |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">en</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x1</td>
+<td style="text-align: center;">SPI Flash Mode Select</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:1]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 <section id="spi-flash-instruction-format-register-ffmt">
 <h6>SPI Flash Instruction Format Register (ffmt)<a class="headerlink" href="#spi-flash-instruction-format-register-ffmt" title="Link to this heading"></a></h6>
 <p>The ffmt register defines the format of the SPI Flash read instruction issued by the controller when accessing the memory-mapped region when the controller is in SPI Flash mode.</p>
 <p>An instruction consists of a command byte, followed by a variable number of address bytes, dummy cycles (padding), and data bytes. The table below describes the function and reset value of each field.</p>
-<p>| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| 0 | cmd_en | RW | 0x1 | Enable sending of command |
-| [3:1] | addr_len | RW | 0x3 | Number of address bytes (0 to 4) |
-| [7:4] | pad_cnt | RW | 0x0 | Number of dummy cycles |
-| [9:8] | cmd_proto | RW | 0x0 | Protocol for transmitting command |
-| [11:10] | addr_proto | RW | 0x0 | Protocol for transmitting address and padding |
-| [13:12] | data_proto | RW | 0x0 | Protocol for receiving data bytes |
-| [15:14] | Reserved | RW | X | Reserved |
-| [23:16] | cmd_code | RW | 0x03 | Value of command byte |
-| [31:24] | pad_code | RW | 0x00 | First 8 bits to transmit during dummy cycles |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">cmd_en</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x1</td>
+<td style="text-align: center;">Enable sending of command</td>
+</tr>
+<tr>
+<td style="text-align: center;">[3:1]</td>
+<td style="text-align: center;">addr_len</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x3</td>
+<td style="text-align: center;">Number of address bytes (0 to 4)</td>
+</tr>
+<tr>
+<td style="text-align: center;">[7:4]</td>
+<td style="text-align: center;">pad_cnt</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Number of dummy cycles</td>
+</tr>
+<tr>
+<td style="text-align: center;">[9:8]</td>
+<td style="text-align: center;">cmd_proto</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Protocol for transmitting command</td>
+</tr>
+<tr>
+<td style="text-align: center;">[11:10]</td>
+<td style="text-align: center;">addr_proto</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Protocol for transmitting address and padding</td>
+</tr>
+<tr>
+<td style="text-align: center;">[13:12]</td>
+<td style="text-align: center;">data_proto</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Protocol for receiving data bytes</td>
+</tr>
+<tr>
+<td style="text-align: center;">[15:14]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">[23:16]</td>
+<td style="text-align: center;">cmd_code</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x03</td>
+<td style="text-align: center;">Value of command byte</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:24]</td>
+<td style="text-align: center;">pad_code</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">First 8 bits to transmit during dummy cycles</td>
+</tr>
+</tbody>
+</table></section>
 <section id="spi-interrupt-registers-ie-and-ip">
 <h6>SPI Interrupt Registers (ie and ip)<a class="headerlink" href="#spi-interrupt-registers-ie-and-ip" title="Link to this heading"></a></h6>
 <p>The ie register controls which SPI interrupts are enabled, while ip is a read-only register indicating pending interrupt conditions. The reset value of ie is zero.</p>
 <p>The txwm condition is triggered when the number of entries in the transmit FIFO is strictly less than the count specified by the txmark register. The pending bit is cleared when the number of enqueued entries is sufficiently large to exceed the watermark.</p>
 <p>The rxwm condition is triggered when the number of entries in the receive FIFO is strictly greater than the count specified by the rxmark register. The pending bit is cleared when the number of dequeued entries is sufficiently small to fall below the watermark.</p>
-<p>SPI Interrupt Enable Register (ie):
-| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| 0 | txwm | RW | 0x0 | Transmit watermark enable |
-| 1 | rxwm | RW | 0x0 | Receive watermark enable |
-| [31:2] | Reserved | RW | X | Reserved |</p>
-<p>SPI Watermark Interrupt Pending Register (ip):
-| Bits | Field Name | Attr. | Rst. | Description |
-|:—–:|:———–:|:——:|:—–:|:————:|
-| 0 | txwm | RO | 0x0 | Transmit watermark pending |
-| 1 | rxwm | RO | 0x0 | Receive watermark pending |
-| [31:2] | Reserved | RW | X | Reserved |</p>
-</section>
+<p>SPI Interrupt Enable Register (ie):</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">txwm</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Transmit watermark enable</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">rxwm</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Receive watermark enable</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:2]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table><p>SPI Watermark Interrupt Pending Register (ip):</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Bits</th>
+<th style="text-align: center;">Field Name</th>
+<th style="text-align: center;">Attr.</th>
+<th style="text-align: center;">Rst.</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">txwm</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Transmit watermark pending</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">rxwm</td>
+<td style="text-align: center;">RO</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">Receive watermark pending</td>
+</tr>
+<tr>
+<td style="text-align: center;">[31:2]</td>
+<td style="text-align: center;">Reserved</td>
+<td style="text-align: center;">RW</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 </section>
 <section id="id20">
@@ -1464,101 +2507,376 @@ The IDCODE for the FU540-C000 is set to 0x20000913.</p>
 <section id="id31">
 <h4>2.4.4 Hardware Interfaces<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
 <p>The mapping of top-level JTAG signals in the U500 module is represented in the following table:</p>
-<p>JTAG Singal | Top JTAG Singal | I/O
-:———–: | :———–: | :———–:
-TCK | jtag_jtag_TCK | input
-TMS | jtag_jtag_TMS | input
-TDI | jtag_jtag_TDI | input
-TDO | jtag_jtag_TDO | output</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">JTAG Singal</th>
+<th style="text-align: center;">Top JTAG Singal</th>
+<th style="text-align: center;">I/O</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">TCK</td>
+<td style="text-align: center;">jtag_jtag_TCK</td>
+<td style="text-align: center;">input</td>
+</tr>
+<tr>
+<td style="text-align: center;">TMS</td>
+<td style="text-align: center;">jtag_jtag_TMS</td>
+<td style="text-align: center;">input</td>
+</tr>
+<tr>
+<td style="text-align: center;">TDI</td>
+<td style="text-align: center;">jtag_jtag_TDI</td>
+<td style="text-align: center;">input</td>
+</tr>
+<tr>
+<td style="text-align: center;">TDO</td>
+<td style="text-align: center;">jtag_jtag_TDO</td>
+<td style="text-align: center;">output</td>
+</tr>
+</tbody>
+</table></section>
 <section id="id32">
 <h4>2.4.5 Registers<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
 <section id="debug-module-debug-bus-registers">
 <h5>2.4.5.1 Debug Module Debug Bus Registers<a class="headerlink" href="#debug-module-debug-bus-registers" title="Link to this heading"></a></h5>
-<p>Address | Name
-:———–: | :———–:
-0x04 |   Abstract Data 0 (data0)
-0x0f|Abstract Data 11 (data11)
-0x10|Debug Module Control (dmcontrol)
-0x11|Debug Module Status (dmstatus)
-0x12|Hart Info (hartinfo)
-0x13|Halt Summary 1 (haltsum1)
-0x14|Hart Array Window Select (hawindowsel)
-0x15|Hart Array Window (hawindow)
-0x16|Abstract Control and Status (abstractcs)
-0x17|Abstract Command (command)
-0x18|Abstract Command Autoexec (abstractauto)
-0x19|Configuration String Pointer 0 (confstrptr0)
-0x1a|Configuration String Pointer 1 (confstrptr1)
-0x1b|Configuration String Pointer 2 (confstrptr2)
-0x1c|Configuration String Pointer 3 (confstrptr3)
-0x1d|Next Debug Module (nextdm)
-0x20|Program Buffer 0 (progbuf0)
-0x2f|Program Buffer 15 (progbuf15)
-0x30|Authentication Data (authdata)
-0x34|Halt Summary 2 (haltsum2)
-0x35|Halt Summary 3 (haltsum3)
-0x37|System Bus Address 127:96 (sbaddress3)
-0x38|System Bus Access Control and Status (sbcs)
-0x39|System Bus Address 31:0 (sbaddress0)
-0x3a|System Bus Address 63:32 (sbaddress1)
-0x3b|System Bus Address 95:64 (sbaddress2)
-0x3c|System Bus Data 31:0 (sbdata0)
-0x3d|System Bus Data 63:32 (sbdata1)
-0x3e|System Bus Data 95:64 (sbdata2)
-0x3f|System Bus Data 127:96 (sbdata3)
-0x40 |Halt Summary 0 (haltsum0) |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Address</th>
+<th style="text-align: center;">Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x04</td>
+<td style="text-align: center;">Abstract Data 0 (data0)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0f</td>
+<td style="text-align: center;">Abstract Data 11 (data11)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x10</td>
+<td style="text-align: center;">Debug Module Control (dmcontrol)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x11</td>
+<td style="text-align: center;">Debug Module Status (dmstatus)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x12</td>
+<td style="text-align: center;">Hart Info (hartinfo)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x13</td>
+<td style="text-align: center;">Halt Summary 1 (haltsum1)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x14</td>
+<td style="text-align: center;">Hart Array Window Select (hawindowsel)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x15</td>
+<td style="text-align: center;">Hart Array Window (hawindow)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x16</td>
+<td style="text-align: center;">Abstract Control and Status (abstractcs)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x17</td>
+<td style="text-align: center;">Abstract Command (command)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x18</td>
+<td style="text-align: center;">Abstract Command Autoexec (abstractauto)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x19</td>
+<td style="text-align: center;">Configuration String Pointer 0 (confstrptr0)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x1a</td>
+<td style="text-align: center;">Configuration String Pointer 1 (confstrptr1)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x1b</td>
+<td style="text-align: center;">Configuration String Pointer 2 (confstrptr2)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x1c</td>
+<td style="text-align: center;">Configuration String Pointer 3 (confstrptr3)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x1d</td>
+<td style="text-align: center;">Next Debug Module (nextdm)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x20</td>
+<td style="text-align: center;">Program Buffer 0 (progbuf0)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x2f</td>
+<td style="text-align: center;">Program Buffer 15 (progbuf15)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x30</td>
+<td style="text-align: center;">Authentication Data (authdata)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x34</td>
+<td style="text-align: center;">Halt Summary 2 (haltsum2)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x35</td>
+<td style="text-align: center;">Halt Summary 3 (haltsum3)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x37</td>
+<td style="text-align: center;">System Bus Address 127:96 (sbaddress3)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x38</td>
+<td style="text-align: center;">System Bus Access Control and Status (sbcs)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x39</td>
+<td style="text-align: center;">System Bus Address 31:0 (sbaddress0)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3a</td>
+<td style="text-align: center;">System Bus Address 63:32 (sbaddress1)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3b</td>
+<td style="text-align: center;">System Bus Address 95:64 (sbaddress2)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3c</td>
+<td style="text-align: center;">System Bus Data 31:0 (sbdata0)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3d</td>
+<td style="text-align: center;">System Bus Data 63:32 (sbdata1)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3e</td>
+<td style="text-align: center;">System Bus Data 95:64 (sbdata2)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x3f</td>
+<td style="text-align: center;">System Bus Data 127:96 (sbdata3)</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x40</td>
+<td style="text-align: center;">Halt Summary 0 (haltsum0)</td>
+</tr>
+</tbody>
+</table></section>
 <section id="dtm-jtag-dtm-registers">
 <h5>2.4.5.2 DTM JTAG DTM Registers<a class="headerlink" href="#dtm-jtag-dtm-registers" title="Link to this heading"></a></h5>
-<p>Address | Name | Descripition
-:———–: | :———–: | :———–:
-0x00 | BYPASS | JTAG recommends this encoding
-0x01 | IDCODE | JTAG recommends this encoding
-0x10 | DTM Control and Status (dtmcs) | For Debugging
-0x11 | Debug Module Interface Access (dmi) | For Debugging
-0x12 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x13 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x14 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x15 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x16 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x17 | Reserved (BYPASS) | Reserved for future RISC-V debugging
-0x1f | BYPASS | JTAG requires this encoding</p>
-<section id="idcode-0x01">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Address</th>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Descripition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">BYPASS</td>
+<td style="text-align: center;">JTAG recommends this encoding</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x01</td>
+<td style="text-align: center;">IDCODE</td>
+<td style="text-align: center;">JTAG recommends this encoding</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x10</td>
+<td style="text-align: center;">DTM Control and Status (dtmcs)</td>
+<td style="text-align: center;">For Debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x11</td>
+<td style="text-align: center;">Debug Module Interface Access (dmi)</td>
+<td style="text-align: center;">For Debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x12</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x13</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x14</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x15</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x16</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x17</td>
+<td style="text-align: center;">Reserved (BYPASS)</td>
+<td style="text-align: center;">Reserved for future RISC-V debugging</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x1f</td>
+<td style="text-align: center;">BYPASS</td>
+<td style="text-align: center;">JTAG requires this encoding</td>
+</tr>
+</tbody>
+</table><section id="idcode-0x01">
 <h6>2.4.5.2.1 IDCODE(0X01)<a class="headerlink" href="#idcode-0x01" title="Link to this heading"></a></h6>
 <p>When the TAP state machine is reset, this register (located in the Instruction Register, IR) is selected. Its definition is exactly consistent with that specified in the IEEE Standard 1149.1-2013.</p>
 <p>This entire register is read-only.</p>
-<p>31:28 | 27:12 | 11:1 | 0
-:———–: | :———–: | :———–: | :———–:
-vERSION | pARTnUMBER | mANUFLD | 1</p>
-<p><strong>ManufId:</strong> Bits 6:0 must be the bits 6:0 of the design/manufacturer identification code specified by the JEDEC standard JEP106. Bits 10:7 contain the modulo-16 count of the continuation characters (0x7f) in the same identification code.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">31:28</th>
+<th style="text-align: center;">27:12</th>
+<th style="text-align: center;">11:1</th>
+<th style="text-align: center;">0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">vERSION</td>
+<td style="text-align: center;">pARTnUMBER</td>
+<td style="text-align: center;">mANUFLD</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table><p><strong>ManufId:</strong> Bits 6:0 must be the bits 6:0 of the design/manufacturer identification code specified by the JEDEC standard JEP106. Bits 10:7 contain the modulo-16 count of the continuation characters (0x7f) in the same identification code.</p>
 </section>
 <section id="dtm-control-and-status-dtmcs-0x10">
 <h6>2.4.5.2.2  DTM Control and Status (dtmcs，0x10)<a class="headerlink" href="#dtm-control-and-status-dtmcs-0x10" title="Link to this heading"></a></h6>
-<p>31:18 | 17 | 16 | 15 | 14:12 | 11:10 | 9:4 | 3:0
-:———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–:|
-0 | dmihardreset | dmireset | 0 | idle | dmistat | abits | version</p>
-<p>| Field | Description | Access | Reset |
-| :———–: | :———–: | :———–: | :———–: |
-| dmihardreset | Writing a 1 to this bit performs a hard reset on the DTM, causing it to forget any ongoing DMI transactions. This should generally only be used when the debugger has reason to expect that the ongoing DMI transactions will never complete (e.g., reset conditions cause an in-progress DMI transaction to be aborted). | W | - |
-| dmireset | Writing a 1 to this bit clears the error state and allows the DTM to retry or complete the previous transaction. | W | - |
-| idle | This is a hint to the debugger regarding the minimum number of cycles it should spend in RunTest/Idle after each DMI scan to avoid returning the ‘busy’ code (dmistat is 3). The debugger must still check dmistat as necessary.  0: No need to enter Run-Test/Idle.   1: Enter Run-Test/Idle and exit immediately. 2: Enter Run-Test/Idle, stay for 1 cycle, then leave. | R  | Preset |
-| dmistat | 0: No error. 1: Reserved. Interpretation is the same as for 2. 2: Operation failed (caused by op (2)). 3: Attempted operation while a DMI access is still in progress (caused by op (3)). | R      | 0      |
-| abits | The size of the address in dmi. | R      | Preset |
-| version | 0: Version described in specification version 0.11. 1: Version described in specification version 0.13. 15: Version not described in any available version of this specification. | R  | 1 |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">31:18</th>
+<th style="text-align: center;">17</th>
+<th style="text-align: center;">16</th>
+<th style="text-align: center;">15</th>
+<th style="text-align: center;">14:12</th>
+<th style="text-align: center;">11:10</th>
+<th style="text-align: center;">9:4</th>
+<th style="text-align: center;">3:0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">dmihardreset</td>
+<td style="text-align: center;">dmireset</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">idle</td>
+<td style="text-align: center;">dmistat</td>
+<td style="text-align: center;">abits</td>
+<td style="text-align: center;">version</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Field</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Access</th>
+<th style="text-align: center;">Reset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">dmihardreset</td>
+<td style="text-align: center;">Writing a 1 to this bit performs a hard reset on the DTM, causing it to forget any ongoing DMI transactions. This should generally only be used when the debugger has reason to expect that the ongoing DMI transactions will never complete (e.g., reset conditions cause an in-progress DMI transaction to be aborted).</td>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">dmireset</td>
+<td style="text-align: center;">Writing a 1 to this bit clears the error state and allows the DTM to retry or complete the previous transaction.</td>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">idle</td>
+<td style="text-align: center;">This is a hint to the debugger regarding the minimum number of cycles it should spend in RunTest/Idle after each DMI scan to avoid returning the 'busy' code (dmistat is 3). The debugger must still check dmistat as necessary.  0: No need to enter Run-Test/Idle.   1: Enter Run-Test/Idle and exit immediately. 2: Enter Run-Test/Idle, stay for 1 cycle, then leave.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">dmistat</td>
+<td style="text-align: center;">0: No error. 1: Reserved. Interpretation is the same as for 2. 2: Operation failed (caused by op (2)). 3: Attempted operation while a DMI access is still in progress (caused by op (3)).</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">abits</td>
+<td style="text-align: center;">The size of the address in dmi.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">version</td>
+<td style="text-align: center;">0: Version described in specification version 0.11. 1: Version described in specification version 0.13. 15: Version not described in any available version of this specification.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="debug-module-interface-access-dmi-0x11">
 <h5>2.4.5.3 Debug  Module Interface Access(dmi,0x11)<a class="headerlink" href="#debug-module-interface-access-dmi-0x11" title="Link to this heading"></a></h5>
 <p>The Debug Module is subordinate to a bus known as the Debug Module Interface (DMI). The master of this bus is the Debug Transport Module (DTM). The Debug Module Interface can be a simple bus with a master and a slave, or it can utilize a more comprehensive bus, such as TileLink or AMBA Advanced Peripheral Bus. The details are left to the system designer.</p>
 <p>DMI uses <strong>7 to 32 address bits</strong>. It supports <strong>read and write</strong> operations. The bottom of the address space is used for the first (often the only) DM. Additional space can be used for custom debug devices, other cores, additional DMs, etc. If there are additional DMs on this DMI, the base address of the next DM in the DMI address space is given in <code class="docutils literal notranslate"><span class="pre">nextdm</span></code>.</p>
 <p>The Debug Module is controlled by accessing its DMI address space through registers.</p>
-<p>| Field   | Description                                                  | Access | Reset |
-| :———–: | :———–:                                                  | :———–: | :———-: |
-| address | The address used for DMI access. This value is used for accessing the DM via DMI during Update-DR. | R/W | 0 |
-| data    | The data sent to the DM via DMI during Update-DR, and the data returned by the DM after a previous operation. | R/W | 0 |
-| op      | When the debugger writes this byte, the meanings are as follows: 0: Ignore data and address. Do not send anything via DMI during Update-DR. This operation will never result in a busy or error response. The address and data reported by the following Capture-DR are undefined. 1: Read from address. (Read) 2: Write data to address. (Write) 3: Reserved. | | |</p>
-<p>When the debugger reads this byte, it indicates:<br />0: The previous operation was successfully completed.<br />1: Reserved.<br />2: The previous operation failed. The data scanned into dmi during this access will be ignored. This state is sticky and can be cleared by writing <code class="docutils literal notranslate"><span class="pre">dmireset</span></code> in <code class="docutils literal notranslate"><span class="pre">dtmcs</span></code>. This indicates that the DM itself responded with an error. There is no specific case for a DM to respond with an error, and DMI does not need to support returning an error.<br />3: An operation was attempted while a DMI request was still in progress. The data scanned into dmi during this access will be ignored. This state is sticky and can be cleared by writing <code class="docutils literal notranslate"><span class="pre">dmireset</span></code> in <code class="docutils literal notranslate"><span class="pre">dtmcs</span></code>. If the debugger sees this state, it needs to provide more TCK edges to the target between UpdateDR and Capture-DR. The simplest method is to add extra transitions in Run-Test/Idle.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Field</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Access</th>
+<th style="text-align: center;">Reset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">address</td>
+<td style="text-align: center;">The address used for DMI access. This value is used for accessing the DM via DMI during Update-DR.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;">The data sent to the DM via DMI during Update-DR, and the data returned by the DM after a previous operation.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">op</td>
+<td style="text-align: center;">When the debugger writes this byte, the meanings are as follows: 0: Ignore data and address. Do not send anything via DMI during Update-DR. This operation will never result in a busy or error response. The address and data reported by the following Capture-DR are undefined. 1: Read from address. (Read) 2: Write data to address. (Write) 3: Reserved.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table><p>When the debugger reads this byte, it indicates:<br />0: The previous operation was successfully completed.<br />1: Reserved.<br />2: The previous operation failed. The data scanned into dmi during this access will be ignored. This state is sticky and can be cleared by writing <code class="docutils literal notranslate"><span class="pre">dmireset</span></code> in <code class="docutils literal notranslate"><span class="pre">dtmcs</span></code>. This indicates that the DM itself responded with an error. There is no specific case for a DM to respond with an error, and DMI does not need to support returning an error.<br />3: An operation was attempted while a DMI request was still in progress. The data scanned into dmi during this access will be ignored. This state is sticky and can be cleared by writing <code class="docutils literal notranslate"><span class="pre">dmireset</span></code> in <code class="docutils literal notranslate"><span class="pre">dtmcs</span></code>. If the debugger sees this state, it needs to provide more TCK edges to the target between UpdateDR and Capture-DR. The simplest method is to add extra transitions in Run-Test/Idle.</p>
 <p>To read an arbitrary Debug Module register, select dmi, scan a value with <code class="docutils literal notranslate"><span class="pre">op</span></code> set to 1, and set the address to the desired register address. During Update-DR, the operation will start, and the result of the operation will be captured as data during Capture-DR. If the operation does not complete in time, <code class="docutils literal notranslate"><span class="pre">op</span></code> will be 3, and the value in <code class="docutils literal notranslate"><span class="pre">data</span></code> must be ignored. The busy state must be cleared by writing <code class="docutils literal notranslate"><span class="pre">dmireset</span></code> in <code class="docutils literal notranslate"><span class="pre">dtmcs</span></code>, and a second scan must be performed. This process must be repeated until <code class="docutils literal notranslate"><span class="pre">op</span></code> returns 0. In subsequent operations, the debugger should allow more time between Capture-DR and Update-DR.</p>
 <p>To write an arbitrary Debug Module register, select dmi, scan a value with <code class="docutils literal notranslate"><span class="pre">op</span></code> set to 2, and set the address and data to the desired register address and data, respectively. From that point on, everything is exactly the same as for a read, except that a write is performed instead of a read.</p>
 <p>There is almost no need to scan the IR, thus avoiding most of the inefficiencies in typical JTAG usage.</p>
@@ -1569,63 +2887,356 @@ vERSION | pARTnUMBER | mANUFLD | 1</p>
 </section>
 <section id="debug-module-control-dmcontrol-0x10">
 <h5>2.4.5.5 Debug Module Control (dmcontrol, 0x10)<a class="headerlink" href="#debug-module-control-dmcontrol-0x10" title="Link to this heading"></a></h5>
-<p>31 | 30 | 29 | 28 | 27 | 26 | 25:16|15:6 | 5:4 | 3 | 2 | 1 | 0
-:———–: | :———–: | :———–: | :———–: | :———–: | :———–: |:———–: |:———–: | :———–: | :———–: | :———–: | :———–: |:———–:
-haltreq | resumereq | hartreset | ackhavereset | 0 | hasel | hartsello|hartselhi | 0 | setresethaltreq | clrresethaltreq | ndmreset | dmactive</p>
-<p>| Field            | Description    | Access | Reset |
-|:——————:|:———-:|:——–:|:——-:|
-| haltreq          | Writing a 0 clears the halt request bit for all currently selected harts, potentially canceling outstanding halt requests for those harts. Writing a 1 sets the halt request bit for all currently selected harts. Running harts will stop when their halt request bit is set. The write applies to the new values of hartsel and hasel. | W      | -     |
-| resumereq        | Writing a 1 will cause them to resume once if the currently selected harts are stopped at the time of the write operation. If haltreq is set, resumereq is ignored. The write applies to the new values of hartsel and hasel.                                                                                                                         | W      | -     |
-| hartreset        | This optional bit writes the reset bit for all currently selected harts. To perform a reset, the debugger writes a 1, followed by a 0 to cancel the reset signal. While this bit is 1, the debugger cannot change the selected hart. If this feature is not implemented, the bit always remains 0, so the debugger can write 1 and then read the register to see if it is supported. | R/W    | 0     |
-| ackhavereset     | 0: Invalid. 1: Clears the havereset bit for any selected hart. The write applies to the new values of hartsel and hasel.                                                                            | W1     | -     |
-| hasel            | 0: There is currently one hart selected by hartsel. 1: There may be multiple harts currently selected, consisting of the hart selected by hartsel, plus any harts selected by the hart mask register.                                                                                 | R/W    | 0     |
-| hartsello       | The lower 10 bits of hartsel: The dm-specific index of the hart to be selected. This hart is always part of the currently selected hart.                                                                                                   | R/W    | 0     |
-| hartselhi       | The upper 10 bits of hartsel: The dm-specific index of the hart to be selected. This hart is always part of the currently selected hart.                                                                                                                                                                                                                   | R/W    | 0     |
-| setresethaltreq | This optional bit writes the reset halt request bit for all currently selected harts unless clrresethaltreq is set to 1 at the same time. When set to 1, each selected hart will stop on the next reset. The reset request bit does not clear automatically. The debugger must write clrresethaltreq to clear it. The write applies to the new values of hartsel and hasel. hasresethaltreq = 0 indicates that this byte is not implemented. | W1     | -     |
-| clrresethaltreq | This optional bit clears the reset request bit for all currently selected harts. The write applies to the new values of hartsel and hasel.                                                                                                                                                                                                                 | W1     | -     |
-| ndmreset         | This bit controls the reset signal from the DM to the rest of the system. The signal should reset every part of the system, including each hart, except for the DM and any logic required to access the DM. To perform a system reset, the debugger writes a 1, followed by a 0 to cancel the reset.                                                                                                                          | R/W    | 0     |
-| dmactive         | This bit acts as a reset signal for the debug module itself. 0: The module is in its reset state, including the authentication mechanism, with the exception of dynamic bits, which are the only bits that can be written to something other than their reset value. 1: The module is functioning normally.                                                                                                              | R/W    | 0     |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">31</th>
+<th style="text-align: center;">30</th>
+<th style="text-align: center;">29</th>
+<th style="text-align: center;">28</th>
+<th style="text-align: center;">27</th>
+<th style="text-align: center;">26</th>
+<th style="text-align: center;">25:16</th>
+<th style="text-align: center;">15:6</th>
+<th style="text-align: center;">5:4</th>
+<th style="text-align: center;">3</th>
+<th style="text-align: center;">2</th>
+<th style="text-align: center;">1</th>
+<th style="text-align: center;">0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">haltreq</td>
+<td style="text-align: center;">resumereq</td>
+<td style="text-align: center;">hartreset</td>
+<td style="text-align: center;">ackhavereset</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">hasel</td>
+<td style="text-align: center;">hartsello</td>
+<td style="text-align: center;">hartselhi</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">setresethaltreq</td>
+<td style="text-align: center;">clrresethaltreq</td>
+<td style="text-align: center;">ndmreset</td>
+<td style="text-align: center;">dmactive</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Field</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Access</th>
+<th style="text-align: center;">Reset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">haltreq</td>
+<td style="text-align: center;">Writing a 0 clears the halt request bit for all currently selected harts, potentially canceling outstanding halt requests for those harts. Writing a 1 sets the halt request bit for all currently selected harts. Running harts will stop when their halt request bit is set. The write applies to the new values of hartsel and hasel.</td>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">resumereq</td>
+<td style="text-align: center;">Writing a 1 will cause them to resume once if the currently selected harts are stopped at the time of the write operation. If haltreq is set, resumereq is ignored. The write applies to the new values of hartsel and hasel.</td>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">hartreset</td>
+<td style="text-align: center;">This optional bit writes the reset bit for all currently selected harts. To perform a reset, the debugger writes a 1, followed by a 0 to cancel the reset signal. While this bit is 1, the debugger cannot change the selected hart. If this feature is not implemented, the bit always remains 0, so the debugger can write 1 and then read the register to see if it is supported.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">ackhavereset</td>
+<td style="text-align: center;">0: Invalid. 1: Clears the havereset bit for any selected hart. The write applies to the new values of hartsel and hasel.</td>
+<td style="text-align: center;">W1</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">hasel</td>
+<td style="text-align: center;">0: There is currently one hart selected by hartsel. 1: There may be multiple harts currently selected, consisting of the hart selected by hartsel, plus any harts selected by the hart mask register.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">hartsello</td>
+<td style="text-align: center;">The lower 10 bits of hartsel: The dm-specific index of the hart to be selected. This hart is always part of the currently selected hart.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">hartselhi</td>
+<td style="text-align: center;">The upper 10 bits of hartsel: The dm-specific index of the hart to be selected. This hart is always part of the currently selected hart.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">setresethaltreq</td>
+<td style="text-align: center;">This optional bit writes the reset halt request bit for all currently selected harts unless clrresethaltreq is set to 1 at the same time. When set to 1, each selected hart will stop on the next reset. The reset request bit does not clear automatically. The debugger must write clrresethaltreq to clear it. The write applies to the new values of hartsel and hasel. hasresethaltreq = 0 indicates that this byte is not implemented.</td>
+<td style="text-align: center;">W1</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">clrresethaltreq</td>
+<td style="text-align: center;">This optional bit clears the reset request bit for all currently selected harts. The write applies to the new values of hartsel and hasel.</td>
+<td style="text-align: center;">W1</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">ndmreset</td>
+<td style="text-align: center;">This bit controls the reset signal from the DM to the rest of the system. The signal should reset every part of the system, including each hart, except for the DM and any logic required to access the DM. To perform a system reset, the debugger writes a 1, followed by a 0 to cancel the reset.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">dmactive</td>
+<td style="text-align: center;">This bit acts as a reset signal for the debug module itself. 0: The module is in its reset state, including the authentication mechanism, with the exception of dynamic bits, which are the only bits that can be written to something other than their reset value. 1: The module is functioning normally.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+</tbody>
+</table></section>
 <section id="debug-module-status-dmstatus-at-0x11">
 <h5>2.4.5.6 Debug Module Status (dmstatus, at 0x11)<a class="headerlink" href="#debug-module-status-dmstatus-at-0x11" title="Link to this heading"></a></h5>
 <p>This register reports the status of the entire debug module and the currently selected hart as defined in <code class="docutils literal notranslate"><span class="pre">hasel</span></code>. Its address will not change in the future because it contains version information.</p>
 <p>The entire register is read-only.</p>
-<p>31:23 | 22 | 21:20 | 19 | 18 | 17 | 16 | 15 | 14 | 13 | 12 | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3:0<br />:———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———–: | :———-: | :———–: | :———–: | :———–: | :———–:
-0 | impebreak | 0 | allhavereset | anyhavereset | allresumeack | anyresumeack | allnonexistent | anynonexistent | allunavail | anyunavail | allrunning | anyrunning | allhalted | anyhalted | authenticated | authbusy | hasresethaltreq | confstrptrvalid | version</p>
-<p>Field | Description | Access | Reset
-:———–: | :———–: | :———–: | :———–:
-impebreak | If set to 1, there is an implicit ebreak instruction at a non-existent word following the program buffer. This allows the debugger to avoid writing ebreak itself and allows the program buffer to be one word shorter. When proprobussize is 1, this value must be 1. | R | Preset
-allhavereset | This bit is 1 when all currently selected harts have been reset and the reset has not been acknowledged. | R | -
-anyhavereset | This bit is 1 when at least one currently selected hart has been reset and that hart has not acknowledged the reset. | R | -
-allresumeack | This bit is 1 when all currently selected harts have acknowledged their last resume request. | R | -
-anyresumeack | This bit is 1 when any currently selected hart has acknowledged its last resume request. | R | -
-allnonexistent | This bit is 1 when the currently selected harts do not exist in this platform. | R | -
-anynonexistent | This bit is 1 when the currently selected harts do not exist in this platform. | R | -
-allunavail | This bit is 1 when all currently selected harts are unavailable. | R | -
-anyunavail | This bit is 1 when any currently selected hart is unavailable. | R | -
-allrunning | This bit is 1 when all currently selected harts are running. | R | -
-anyrunning | This bit is 1 when any currently selected hart is running. | R | -
-allhalted | This bit is 1 when all currently selected harts are halted. | R | -
-anyhalted | This bit is 1 when any currently selected hart is halted. | R | -
-authenticated | 0: Authentication is required before using the DM. 1: Authentication check passed. | R | Preset |
-authbusy | 0: The authentication module is ready to process the next read of authdata. 1: The authentication module is busy. Accessing authdata will result in unspecified behavior. | R | 0 |
-hasresethaltreq | 1: If this debug module supports the reset-halt feature controlled by setresethaltreq and clrresethaltreq bits. 0: Otherwise. | R | Preset |
-confstrptrvalid | 0: confstrptr0{confstrptr3 stores information unrelated to the configuration string. 1: confstrptr0{confstrptr3 stores the address of the configuration string. | R | Preset |
-version | 0: No debug module exists. 1: There is a debug module that complies with version 0.11 of this specification. 2: There is a debug module that complies with version 0.13 of this specification. 3: There is a debug module, but it does not comply with any available version of this specification. | R |  |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">31:23</th>
+<th style="text-align: center;">22</th>
+<th style="text-align: center;">21:20</th>
+<th style="text-align: center;">19</th>
+<th style="text-align: center;">18</th>
+<th style="text-align: center;">17</th>
+<th style="text-align: center;">16</th>
+<th style="text-align: center;">15</th>
+<th style="text-align: center;">14</th>
+<th style="text-align: center;">13</th>
+<th style="text-align: center;">12</th>
+<th style="text-align: center;">11</th>
+<th style="text-align: center;">10</th>
+<th style="text-align: center;">9</th>
+<th style="text-align: center;">8</th>
+<th style="text-align: center;">7</th>
+<th style="text-align: center;">6</th>
+<th style="text-align: center;">5</th>
+<th style="text-align: center;">4</th>
+<th style="text-align: center;">3:0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">impebreak</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">allhavereset</td>
+<td style="text-align: center;">anyhavereset</td>
+<td style="text-align: center;">allresumeack</td>
+<td style="text-align: center;">anyresumeack</td>
+<td style="text-align: center;">allnonexistent</td>
+<td style="text-align: center;">anynonexistent</td>
+<td style="text-align: center;">allunavail</td>
+<td style="text-align: center;">anyunavail</td>
+<td style="text-align: center;">allrunning</td>
+<td style="text-align: center;">anyrunning</td>
+<td style="text-align: center;">allhalted</td>
+<td style="text-align: center;">anyhalted</td>
+<td style="text-align: center;">authenticated</td>
+<td style="text-align: center;">authbusy</td>
+<td style="text-align: center;">hasresethaltreq</td>
+<td style="text-align: center;">confstrptrvalid</td>
+<td style="text-align: center;">version</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Field</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Access</th>
+<th style="text-align: center;">Reset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">impebreak</td>
+<td style="text-align: center;">If set to 1, there is an implicit ebreak instruction at a non-existent word following the program buffer. This allows the debugger to avoid writing ebreak itself and allows the program buffer to be one word shorter. When proprobussize is 1, this value must be 1.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">allhavereset</td>
+<td style="text-align: center;">This bit is 1 when all currently selected harts have been reset and the reset has not been acknowledged.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anyhavereset</td>
+<td style="text-align: center;">This bit is 1 when at least one currently selected hart has been reset and that hart has not acknowledged the reset.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">allresumeack</td>
+<td style="text-align: center;">This bit is 1 when all currently selected harts have acknowledged their last resume request.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anyresumeack</td>
+<td style="text-align: center;">This bit is 1 when any currently selected hart has acknowledged its last resume request.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">allnonexistent</td>
+<td style="text-align: center;">This bit is 1 when the currently selected harts do not exist in this platform.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anynonexistent</td>
+<td style="text-align: center;">This bit is 1 when the currently selected harts do not exist in this platform.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">allunavail</td>
+<td style="text-align: center;">This bit is 1 when all currently selected harts are unavailable.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anyunavail</td>
+<td style="text-align: center;">This bit is 1 when any currently selected hart is unavailable.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">allrunning</td>
+<td style="text-align: center;">This bit is 1 when all currently selected harts are running.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anyrunning</td>
+<td style="text-align: center;">This bit is 1 when any currently selected hart is running.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">allhalted</td>
+<td style="text-align: center;">This bit is 1 when all currently selected harts are halted.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">anyhalted</td>
+<td style="text-align: center;">This bit is 1 when any currently selected hart is halted.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td style="text-align: center;">authenticated</td>
+<td style="text-align: center;">0: Authentication is required before using the DM. 1: Authentication check passed.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">authbusy</td>
+<td style="text-align: center;">0: The authentication module is ready to process the next read of authdata. 1: The authentication module is busy. Accessing authdata will result in unspecified behavior.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">hasresethaltreq</td>
+<td style="text-align: center;">1: If this debug module supports the reset-halt feature controlled by setresethaltreq and clrresethaltreq bits. 0: Otherwise.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">confstrptrvalid</td>
+<td style="text-align: center;">0: confstrptr0{confstrptr3 stores information unrelated to the configuration string. 1: confstrptr0{confstrptr3 stores the address of the configuration string.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">version</td>
+<td style="text-align: center;">0: No debug module exists. 1: There is a debug module that complies with version 0.11 of this specification. 2: There is a debug module that complies with version 0.13 of this specification. 3: There is a debug module, but it does not comply with any available version of this specification.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></section>
 <section id="abstract-control-and-status-abstractcs-at-0x16">
 <h5>2.4.5.7 Abstract Control and Status (abstractcs, at 0x16)<a class="headerlink" href="#abstract-control-and-status-abstractcs-at-0x16" title="Link to this heading"></a></h5>
-<p>31：29 | 28：24 | 23:13 | 12 | 11 | 10:8 | 7:4 | 3:0
-:———–: | :———–: | :———–: | :———–:| :———–: | :———–: | :———–: | :———–:
-0 | progbufsize | 0 | busy | 0 | cmderr | 0 | datacount</p>
-<p>Sure, here is the professional English translation of the provided table:</p>
-<p>Field | Description | Access | Reset
-:———–: | :———–: | :———–: | :———–:
-progbufsize | Size of the program buffer, represented in 32-bit words. Valid sizes range from 0 to 16. | R | Preset
-busy | 1: Indicates that an abstract command is currently being executed. This bit is set immediately when the command is written and is cleared only after the command has completed. | R/W | 0
-cmderr | Captures if an abstract command fails. The bits in this byte remain unchanged until they are cleared by writing 1 to them. No abstract command will be initiated until this value is reset to 0. This byte contains a valid value only when busy is 0. 0 (none): No error. 1 (busy): An abstract command is being executed when either command, abstractcs, or abstractauto is written, or when one of the data or program registers is read or written. This status can only be written when cmderr contains 0. 2 (not supported): The requested command is not supported, regardless of whether the hart is running or not. 3 (exception): An exception occurred during the execution of the command (e.g., while executing the program buffer). 4 (halt/resume): The abstract command cannot be executed because the hart is not in the required state (running/stopped) or is unavailable. 5 (bus): The abstract command failed due to a bus error (e.g., alignment, access size, or timeout). 7 (other): The command failed for other reasons. | R/W1C | 0
-datacount | The number of data registers implemented as part of the abstract command interface. Valid lengths range from 1 to 12. | R | Preset-</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">31：29</th>
+<th style="text-align: center;">28：24</th>
+<th style="text-align: center;">23:13</th>
+<th style="text-align: center;">12</th>
+<th style="text-align: center;">11</th>
+<th style="text-align: center;">10:8</th>
+<th style="text-align: center;">7:4</th>
+<th style="text-align: center;">3:0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">progbufsize</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">busy</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">cmderr</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">datacount</td>
+</tr>
+</tbody>
+</table><p>Sure, here is the professional English translation of the provided table:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Field</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Access</th>
+<th style="text-align: center;">Reset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">progbufsize</td>
+<td style="text-align: center;">Size of the program buffer, represented in 32-bit words. Valid sizes range from 0 to 16.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset</td>
+</tr>
+<tr>
+<td style="text-align: center;">busy</td>
+<td style="text-align: center;">1: Indicates that an abstract command is currently being executed. This bit is set immediately when the command is written and is cleared only after the command has completed.</td>
+<td style="text-align: center;">R/W</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmderr</td>
+<td style="text-align: center;">Captures if an abstract command fails. The bits in this byte remain unchanged until they are cleared by writing 1 to them. No abstract command will be initiated until this value is reset to 0. This byte contains a valid value only when busy is 0. 0 (none): No error. 1 (busy): An abstract command is being executed when either command, abstractcs, or abstractauto is written, or when one of the data or program registers is read or written. This status can only be written when cmderr contains 0. 2 (not supported): The requested command is not supported, regardless of whether the hart is running or not. 3 (exception): An exception occurred during the execution of the command (e.g., while executing the program buffer). 4 (halt/resume): The abstract command cannot be executed because the hart is not in the required state (running/stopped) or is unavailable. 5 (bus): The abstract command failed due to a bus error (e.g., alignment, access size, or timeout). 7 (other): The command failed for other reasons.</td>
+<td style="text-align: center;">R/W1C</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">datacount</td>
+<td style="text-align: center;">The number of data registers implemented as part of the abstract command interface. Valid lengths range from 1 to 12.</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">Preset-</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="id33">
 <h4>2.4.6 Checklist<a class="headerlink" href="#id33" title="Link to this heading"></a></h4>
@@ -1835,15 +3446,47 @@ datacount | The number of data registers implemented as part of the abstract com
 <section id="result-of-test">
 <h5>2.5.3.3 Result of Test<a class="headerlink" href="#result-of-test" title="Link to this heading"></a></h5>
 <p>Primarily test the address spaces for DDR and IRAM. The testing method involves separately testing the low, middle, and high parts of both address spaces. A portion of addresses in each part are tested. The test results are as follows:</p>
-<p>Address | Result | Issue
-:———–: | :———–: | :———–:
-0x8000_0000~0x8000_9C40 (10000 addresses) | Correct |
-0x9FFF_D1C0~0xA000_130C (10000 addresses) | Correct |
-0xBFFF_63C0~0xC000_0000 (10000 addresses) | Partial Errors | The last three addresses read data as 0. After comparing waveforms and code, it was found to be an issue with the mounted VIP. Setting the working mode of the VIP mounted to <code class="docutils literal notranslate"><span class="pre">spi_1</span></code> to SLAVE resulted in correct operation.
-0x5000_0000~0x5000_1F40 (2000 addresses) | Correct |
-0x5003_F060~0x5004_0FA0 (2000 addresses) | Correct |
-0x5007_E0C0~0x5008_0000 (2000 addresses) | Correct |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Address</th>
+<th style="text-align: center;">Result</th>
+<th style="text-align: center;">Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x8000_0000~0x8000_9C40 (10000 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x9FFF_D1C0~0xA000_130C (10000 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0xBFFF_63C0~0xC000_0000 (10000 addresses)</td>
+<td style="text-align: center;">Partial Errors</td>
+<td style="text-align: center;">The last three addresses read data as 0. After comparing waveforms and code, it was found to be an issue with the mounted VIP. Setting the working mode of the VIP mounted to <code>spi_1</code> to SLAVE resulted in correct operation.</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5000_0000~0x5000_1F40 (2000 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5003_F060~0x5004_0FA0 (2000 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5007_E0C0~0x5008_0000 (2000 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></section>
 <section id="software-testing">
 <h5>2.5.3.4 Software Testing<a class="headerlink" href="#software-testing" title="Link to this heading"></a></h5>
 <p>Translate the above SystemVerilog test code into C language code for software testing. The C code is as follows:</p>
@@ -1983,49 +3626,176 @@ datacount | The number of data registers implemented as part of the abstract com
 </pre></div>
 </div>
 <p>Then, run this test case, compile the above C code into a hex file and load it into the RAM. Run the simulation, and the simulation results are as follows:</p>
-<p>Address | Result | Issue
-:———–: | :———–: | :———–:
-0x8000_0000~0x8000_0FA0 (500 addresses) | Correct |
-0x9FFF_F830~0xA000_07D0 (500 addresses) | Correct |
-0xBFFF_F060~0xC000_0000 (500 addresses) | Correct |
-0x5000_0000~0x5000_0FA0 (500 addresses) | Correct |
-0x5003_F830~0x5004_07D0 (500 addresses) | Correct |
-0x5007_F060~0x5008_0000 (500 addresses) | Correct |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Address</th>
+<th style="text-align: center;">Result</th>
+<th style="text-align: center;">Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x8000_0000~0x8000_0FA0 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x9FFF_F830~0xA000_07D0 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0xBFFF_F060~0xC000_0000 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5000_0000~0x5000_0FA0 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5003_F830~0x5004_07D0 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5007_F060~0x5008_0000 (500 addresses)</td>
+<td style="text-align: center;">Correct</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="id37">
 <h4>2.5.4 Hardware Interfaces<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
-<p>Signal | Direction | Description
-:———–: | :———–: | :———–:
-spi_clk | output | Master Clock
-spi_csn0 | output | Chip Selcet0
-spi_csn1 | output | Chip Selcet1
-spi_csn2 | output | Chip Selcet2
-spi_csn3 | output | Chip Selcet3
-spi_mode[1:0] | output | SPI Mode
-spi_sdo0 | output | Output Line0
-spi_sdo1 | output | Output Line1
-spi_sdo2 | output | Output Line2
-spi_sdo3 | output | Output Line3
-spi_sdi0 | input | Input Line0
-spi_sdi1 | input | Input Line1
-spi_sdi2 | input | Input Line2
-spi_sdi3 | input | Input Line3</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Signal</th>
+<th style="text-align: center;">Direction</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">spi_clk</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Master Clock</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_csn0</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Chip Selcet0</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_csn1</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Chip Selcet1</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_csn2</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Chip Selcet2</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_csn3</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Chip Selcet3</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_mode[1:0]</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">SPI Mode</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdo0</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Output Line0</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdo1</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Output Line1</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdo2</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Output Line2</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdo3</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">Output Line3</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdi0</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">Input Line0</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdi1</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">Input Line1</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdi2</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">Input Line2</td>
+</tr>
+<tr>
+<td style="text-align: center;">spi_sdi3</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">Input Line3</td>
+</tr>
+</tbody>
+</table></section>
 <section id="id38">
 <h4>2.5.5 Registers<a class="headerlink" href="#id38" title="Link to this heading"></a></h4>
 <p>According to the pulpino documentation, the control registers and related functionalities for SPI_1 are as follows:</p>
-<p>Offset | Name
-:———–:| :———–:
-0x00 | STATUS
-0x08 | CLKDIV
-0x10 | SPICMD
-0x18 | SPIADR
-0x20 | SPILEN
-0x28 | SPIDUM
-0x40 | TXFIFO
-0x80 | RXFIFO</p>
-<section id="status-status-register">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Offset</th>
+<th style="text-align: center;">Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x00</td>
+<td style="text-align: center;">STATUS</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x08</td>
+<td style="text-align: center;">CLKDIV</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x10</td>
+<td style="text-align: center;">SPICMD</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x18</td>
+<td style="text-align: center;">SPIADR</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x20</td>
+<td style="text-align: center;">SPILEN</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x28</td>
+<td style="text-align: center;">SPIDUM</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x40</td>
+<td style="text-align: center;">TXFIFO</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x80</td>
+<td style="text-align: center;">RXFIFO</td>
+</tr>
+</tbody>
+</table><section id="status-status-register">
 <h5>2.5.5.1 STATUS（Status Register）<a class="headerlink" href="#status-status-register" title="Link to this heading"></a></h5>
 <p><strong>Reset Value：0x0000_0000</strong>
 <img alt="alt text" src="../_images/38481e84-dde1-44ed-b3ca-65937ab976b5.png" /></p>
@@ -2209,16 +3979,60 @@ This is an interpretat**ion of the hw part of the sram_ctrl code.</p>
 </section>
 <section id="parameters">
 <h4>2.6.4.1 Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
-<p>| Parameter | Default | Top Earlgrey | Description |
-| :———–: | :———–: | :———–: | :———–: |
-| <code class="docutils literal notranslate"><span class="pre">AlertAsyncOn</span></code> | 1’b1 | 1’b1 | |
-| <code class="docutils literal notranslate"><span class="pre">InstrExec</span></code> | 1 | 1 | Enable execution from SRAM side |
-| <code class="docutils literal notranslate"><span class="pre">MemSizeRam</span></code> | 4096 | (multiple values) | Number of 32-bit words in SRAM (overridable by topgen) |
-| <code class="docutils literal notranslate"><span class="pre">RndCnstSramKey</span></code> | (see RTL) | (see RTL) | Random default constant for Scrambling Key at compile time |
-| <code class="docutils literal notranslate"><span class="pre">RndCnstSramNonce</span></code> | (see RTL) | (see RTL) | Random default constant for Scrambling Nonce at compile time |
-| <code class="docutils literal notranslate"><span class="pre">RndCnstLfsrSeed</span></code> | (see RTL) | (see RTL) | Random default constant for LFSR seed at compile time |
-| <code class="docutils literal notranslate"><span class="pre">RndCnstLfsrPerm</span></code> | (see RTL) | (see RTL) | Random default constants for LFSR permutation at compile time |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Parameter</th>
+<th style="text-align: center;">Default</th>
+<th style="text-align: center;">Top Earlgrey</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>AlertAsyncOn</code></td>
+<td style="text-align: center;">1'b1</td>
+<td style="text-align: center;">1'b1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>InstrExec</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Enable execution from SRAM side</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>MemSizeRam</code></td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;">(multiple values)</td>
+<td style="text-align: center;">Number of 32-bit words in SRAM (overridable by topgen)</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>RndCnstSramKey</code></td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">Random default constant for Scrambling Key at compile time</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>RndCnstSramNonce</code></td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">Random default constant for Scrambling Nonce at compile time</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>RndCnstLfsrSeed</code></td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">Random default constant for LFSR seed at compile time</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>RndCnstLfsrPerm</code></td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">(see RTL)</td>
+<td style="text-align: center;">Random default constants for LFSR permutation at compile time</td>
+</tr>
+</tbody>
+</table></section>
 <section id="external-signal-interfaces">
 <h4>2.6.4.2 External Signal Interfaces<a class="headerlink" href="#external-signal-interfaces" title="Link to this heading"></a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">sram_ctrl</span></code> module defines the following hardware interfaces:</p>
@@ -2233,44 +4047,172 @@ This is an interpretat**ion of the hw part of the sram_ctrl code.</p>
 </section>
 <section id="internal-signal-interfaces">
 <h4>2.6.4.3 Internal Signal Interfaces<a class="headerlink" href="#internal-signal-interfaces" title="Link to this heading"></a></h4>
-<p>| Port Name | Package::Struct | Type | Act | Width | Description |
-| :———–: | :———–:| :———–: | :———–: | :———–: | :———–: |
-| <code class="docutils literal notranslate"><span class="pre">sram_otp_key</span></code> | <code class="docutils literal notranslate"><span class="pre">otp_ctrl_pkg::sram_otp_key</span></code> | <code class="docutils literal notranslate"><span class="pre">req_rsp</span></code> | <code class="docutils literal notranslate"><span class="pre">req</span></code> | 1 | |
-| <code class="docutils literal notranslate"><span class="pre">cfg</span></code> | <code class="docutils literal notranslate"><span class="pre">prim_ram_1p_pkg::ram_1p_cfg</span></code> | <code class="docutils literal notranslate"><span class="pre">uni</span></code> | <code class="docutils literal notranslate"><span class="pre">rcv</span></code> | 1 | Routine signal cfg |
-| <code class="docutils literal notranslate"><span class="pre">lc_escalate_en</span></code> | <code class="docutils literal notranslate"><span class="pre">lc_ctrl_pkg::lc_tx</span></code> | <code class="docutils literal notranslate"><span class="pre">uni</span></code> | <code class="docutils literal notranslate"><span class="pre">rcv</span></code> | 1 | Global and local upgrade enable |
-| <code class="docutils literal notranslate"><span class="pre">lc_hw_debug_en</span></code> | <code class="docutils literal notranslate"><span class="pre">lc_ctrl_pkg::lc_tx</span></code> | <code class="docutils literal notranslate"><span class="pre">uni</span></code> | <code class="docutils literal notranslate"><span class="pre">rcv</span></code> | 1 | |
-| <code class="docutils literal notranslate"><span class="pre">otp_en_sram_ifetch</span></code> | <code class="docutils literal notranslate"><span class="pre">prim_mubi_pkg::mubi8</span></code> | <code class="docutils literal notranslate"><span class="pre">uni</span></code> | <code class="docutils literal notranslate"><span class="pre">rcv</span></code> | 1 | |
-| <code class="docutils literal notranslate"><span class="pre">regs_tl</span></code> | <code class="docutils literal notranslate"><span class="pre">tlul_pkg::tl</span></code> | <code class="docutils literal notranslate"><span class="pre">req_rsp</span></code> | <code class="docutils literal notranslate"><span class="pre">rsp</span></code> | 1 | |
-| <code class="docutils literal notranslate"><span class="pre">ram_tl</span></code> | <code class="docutils literal notranslate"><span class="pre">tlul_pkg::tl</span></code> | <code class="docutils literal notranslate"><span class="pre">req_rsp</span></code> | <code class="docutils literal notranslate"><span class="pre">rsp</span></code> | 1 | |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Port Name</th>
+<th style="text-align: center;">Package::Struct</th>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Act</th>
+<th style="text-align: center;">Width</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>sram_otp_key</code></td>
+<td style="text-align: center;"><code>otp_ctrl_pkg::sram_otp_key</code></td>
+<td style="text-align: center;"><code>req_rsp</code></td>
+<td style="text-align: center;"><code>req</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>cfg</code></td>
+<td style="text-align: center;"><code>prim_ram_1p_pkg::ram_1p_cfg</code></td>
+<td style="text-align: center;"><code>uni</code></td>
+<td style="text-align: center;"><code>rcv</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Routine signal cfg</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>lc_escalate_en</code></td>
+<td style="text-align: center;"><code>lc_ctrl_pkg::lc_tx</code></td>
+<td style="text-align: center;"><code>uni</code></td>
+<td style="text-align: center;"><code>rcv</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Global and local upgrade enable</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>lc_hw_debug_en</code></td>
+<td style="text-align: center;"><code>lc_ctrl_pkg::lc_tx</code></td>
+<td style="text-align: center;"><code>uni</code></td>
+<td style="text-align: center;"><code>rcv</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>otp_en_sram_ifetch</code></td>
+<td style="text-align: center;"><code>prim_mubi_pkg::mubi8</code></td>
+<td style="text-align: center;"><code>uni</code></td>
+<td style="text-align: center;"><code>rcv</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>regs_tl</code></td>
+<td style="text-align: center;"><code>tlul_pkg::tl</code></td>
+<td style="text-align: center;"><code>req_rsp</code></td>
+<td style="text-align: center;"><code>rsp</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>ram_tl</code></td>
+<td style="text-align: center;"><code>tlul_pkg::tl</code></td>
+<td style="text-align: center;"><code>req_rsp</code></td>
+<td style="text-align: center;"><code>rsp</code></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></section>
 <section id="alert-signals">
 <h4>2.6.4.4 Alert Signals<a class="headerlink" href="#alert-signals" title="Link to this heading"></a></h4>
-<p>| Alert Name | Description |
-| :———– | :———– |
-| <code class="docutils literal notranslate"><span class="pre">fatal_error</span></code> | Triggered when a fatal TL-UL bus integrity failure or initialization mechanism reaches an invalid state. |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: left;">Alert Name</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>fatal_error</code></td>
+<td style="text-align: left;">Triggered when a fatal TL-UL bus integrity failure or initialization mechanism reaches an invalid state.</td>
+</tr>
+</tbody>
+</table></section>
 <section id="safety-measures">
 <h4>2.6.4.5 Safety Measures<a class="headerlink" href="#safety-measures" title="Link to this heading"></a></h4>
-<p>| Countermeasure ID | Description |
-| :———–: | :———–: |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.BUS.INTEGRITY</span></code> | End-to-end bus integrity scheme. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.CTRL.CONFIG.REGWEN</span></code> | SRAM control registers are protected by REGWEN. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.EXEC.CONFIG.REGWEN</span></code> | SRAM execution enable register is protected by REGWEN. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.EXEC.CONFIG.MUBI</span></code> | SRAM execution enable register is multi-bit encoded. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.EXEC.INTERSIG.MUBI</span></code> | SRAM execution enable signal from OTP is multi-bit encoded. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.LC_ESCALATE_EN.INTERSIG.MUBI</span></code> | Life cycle escalation enable signal is multi-bit encoded. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.LC_HW_DEBUG_EN.INTERSIG.MUBI</span></code> | Life cycle hardware debug enable signal is multi-bit encoded. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.MEM.INTEGRITY</span></code> | End-to-end data/memory integrity scheme. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.MEM.SCRAMBLE</span></code> | Data is scrambled using a key-reduced round PRINCE cipher in CTR mode. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.ADDR.SCRAMBLE</span></code> | Addresses are scrambled using a keyed lightweight permutation/diffusion function. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.INSTR.BUS.LC_GATED</span></code> | Prevent code execution from SRAM during non-test lifecycle states. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.RAM_TL_LC_GATE.FSM.SPARSE</span></code> | Control FSM within TL-UL gating primitive is sparse encoded. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.KEY.GLOBAL_ESC</span></code> | Scrambling key and nonce are reset to fixed values during escalation, and bus transactions to memory are blocked. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.KEY.LOCAL_ESC</span></code> | Scrambling key and nonce are reset to fixed values during local escalation due to bus integrity or counter errors, and bus transactions to memory are blocked. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.INIT.CTR.REDUN</span></code> | Initialization counter is redundant. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.SCRAMBLE.KEY.SIDELOAD</span></code> | Scrambling key is sideloaded from OTP and cannot be read by software. |
-| <code class="docutils literal notranslate"><span class="pre">SRAM_CTRL.TLUL_FIFO.CTR.REDUN</span></code> | TL-UL response FIFO pointers are implemented using redundant counters. |</p>
-<section id="interface-between-otp-and-sram-scrambling-primitives">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Countermeasure ID</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.BUS.INTEGRITY</code></td>
+<td style="text-align: center;">End-to-end bus integrity scheme.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.CTRL.CONFIG.REGWEN</code></td>
+<td style="text-align: center;">SRAM control registers are protected by REGWEN.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.EXEC.CONFIG.REGWEN</code></td>
+<td style="text-align: center;">SRAM execution enable register is protected by REGWEN.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.EXEC.CONFIG.MUBI</code></td>
+<td style="text-align: center;">SRAM execution enable register is multi-bit encoded.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.EXEC.INTERSIG.MUBI</code></td>
+<td style="text-align: center;">SRAM execution enable signal from OTP is multi-bit encoded.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.LC_ESCALATE_EN.INTERSIG.MUBI</code></td>
+<td style="text-align: center;">Life cycle escalation enable signal is multi-bit encoded.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.LC_HW_DEBUG_EN.INTERSIG.MUBI</code></td>
+<td style="text-align: center;">Life cycle hardware debug enable signal is multi-bit encoded.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.MEM.INTEGRITY</code></td>
+<td style="text-align: center;">End-to-end data/memory integrity scheme.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.MEM.SCRAMBLE</code></td>
+<td style="text-align: center;">Data is scrambled using a key-reduced round PRINCE cipher in CTR mode.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.ADDR.SCRAMBLE</code></td>
+<td style="text-align: center;">Addresses are scrambled using a keyed lightweight permutation/diffusion function.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.INSTR.BUS.LC_GATED</code></td>
+<td style="text-align: center;">Prevent code execution from SRAM during non-test lifecycle states.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.RAM_TL_LC_GATE.FSM.SPARSE</code></td>
+<td style="text-align: center;">Control FSM within TL-UL gating primitive is sparse encoded.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.KEY.GLOBAL_ESC</code></td>
+<td style="text-align: center;">Scrambling key and nonce are reset to fixed values during escalation, and bus transactions to memory are blocked.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.KEY.LOCAL_ESC</code></td>
+<td style="text-align: center;">Scrambling key and nonce are reset to fixed values during local escalation due to bus integrity or counter errors, and bus transactions to memory are blocked.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.INIT.CTR.REDUN</code></td>
+<td style="text-align: center;">Initialization counter is redundant.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.SCRAMBLE.KEY.SIDELOAD</code></td>
+<td style="text-align: center;">Scrambling key is sideloaded from OTP and cannot be read by software.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SRAM_CTRL.TLUL_FIFO.CTR.REDUN</code></td>
+<td style="text-align: center;">TL-UL response FIFO pointers are implemented using redundant counters.</td>
+</tr>
+</tbody>
+</table><section id="interface-between-otp-and-sram-scrambling-primitives">
 <h5>2.6.4.5.1 Interface between OTP and SRAM Scrambling Primitives<a class="headerlink" href="#interface-between-otp-and-sram-scrambling-primitives" title="Link to this heading"></a></h5>
 <div align=center><img src="photo/image-14.png" width="500"  alt="2">  <div>
 <div align=left><div>     <ul class="simple">
@@ -2298,16 +4240,60 @@ This is an interpretat**ion of the hw part of the sram_ctrl code.</p>
 <p>Detailed reading of
 <a class="reference external" href="https://opentitan.org/book/hw/ip/sram_ctrl/doc/registers.html">OpenTitan SRAM CTRL Register Configuration</a>,
 here is the basic description.</p>
-<p>Name | Offset | Length | Description
-:———–: | :———–: | :———–: | :———–:
-sram_ctrl.<strong>ALERT_TEST</strong> | 0x0 | 4 | Alert Test Register (1 bit for alert)
-sram_ctrl.<strong>STATUS</strong> | 0x4 | 4 | SRAM Status Register (6 states; 1-bit thermal)
-sram_ctrl.<strong>EXEC_REGWEN</strong> | 0x8 | 4 | Execution Enable Register Lock (EXEC’s enable)
-sram_ctrl.<strong>EXEC</strong> | 0xc | 4 | SRAM Execution Enable (4 bits, related to OTG function)
-sram_ctrl.<strong>CTRL_REGWEN</strong> | 0x10 | 4 | Control Register Lock (CTRL’s enable)
-sram_ctrl.<strong>CTRL</strong> | 0x14 | 4 | SRAM Control Register (2 bits, related to OTG and LFSR control)
-sram_ctrl.<strong>SCR_KEY_ROTATED</strong> | 0x18 | 4 | Clearable SRAM Key Request Status (4 bits, related to OTG function)</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Offset</th>
+<th style="text-align: center;">Length</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>ALERT_TEST</strong></td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Alert Test Register (1 bit for alert)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>STATUS</strong></td>
+<td style="text-align: center;">0x4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">SRAM Status Register (6 states; 1-bit thermal)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>EXEC_REGWEN</strong></td>
+<td style="text-align: center;">0x8</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Execution Enable Register Lock (EXEC's enable)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>EXEC</strong></td>
+<td style="text-align: center;">0xc</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">SRAM Execution Enable (4 bits, related to OTG function)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>CTRL_REGWEN</strong></td>
+<td style="text-align: center;">0x10</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Control Register Lock (CTRL's enable)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>CTRL</strong></td>
+<td style="text-align: center;">0x14</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">SRAM Control Register (2 bits, related to OTG and LFSR control)</td>
+</tr>
+<tr>
+<td style="text-align: center;">sram_ctrl.<strong>SCR_KEY_ROTATED</strong></td>
+<td style="text-align: center;">0x18</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Clearable SRAM Key Request Status (4 bits, related to OTG function)</td>
+</tr>
+</tbody>
+</table></section>
 <section id="external-interface-function">
 <h4>2.6.6 External Interface Function<a class="headerlink" href="#external-interface-function" title="Link to this heading"></a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">dif_sram_ctrl.h</span></code></p>
@@ -2432,9 +4418,102 @@ Clock and reset time sequence diagram
 <section id="peripheral-architecture">
 <h4>3.4.3  Peripheral Architecture<a class="headerlink" href="#peripheral-architecture" title="Link to this heading"></a></h4>
 <p>The peripherals of this project and the memory mapping of peripherals are shown below</p>
-<p>|Base|Size|Description|Notes|<br />|:-:|:-:|:-:|:-:|
-|0x0000_0000|4K|debug-controller||<br />|0x0000_3000|4K|error-device||<br />|0x0001_0000|8K|mask rom||<br />|0x0200_0000|64k|clink||<br />|0x0c00_0000|4M|plic||<br />|0x5000_0000|512K|on chip sram||<br />|0x5100_0000|4K|soc_lsys||<br />|0x5200_0000|4K|spi_1||<br />|0x6000_0000|64M|timeout||<br />|0x6400_0000|4K|serial|narrow or sparse is not supported|<br />|0x6400_1000|4K|spi_0|narrow or sparse is not supported|<br />|0x6400_2000|4K|gpio|narrow or sparse is not supported|<br />|0x8000_0000|1G|DDR(CHIPLINK)||<br />|0Xc000_0000|1G|timeout|this space is not accessible and access will case the bus to crash|</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Base</th>
+<th style="text-align: center;">Size</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0x0000_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">debug-controller</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0000_3000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">error-device</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0001_0000</td>
+<td style="text-align: center;">8K</td>
+<td style="text-align: center;">mask rom</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0200_0000</td>
+<td style="text-align: center;">64k</td>
+<td style="text-align: center;">clink</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x0c00_0000</td>
+<td style="text-align: center;">4M</td>
+<td style="text-align: center;">plic</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5000_0000</td>
+<td style="text-align: center;">512K</td>
+<td style="text-align: center;">on chip sram</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5100_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">soc_lsys</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x5200_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">spi_1</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6000_0000</td>
+<td style="text-align: center;">64M</td>
+<td style="text-align: center;">timeout</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_0000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">serial</td>
+<td style="text-align: center;">narrow or sparse is not supported</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_1000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">spi_0</td>
+<td style="text-align: center;">narrow or sparse is not supported</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x6400_2000</td>
+<td style="text-align: center;">4K</td>
+<td style="text-align: center;">gpio</td>
+<td style="text-align: center;">narrow or sparse is not supported</td>
+</tr>
+<tr>
+<td style="text-align: center;">0x8000_0000</td>
+<td style="text-align: center;">1G</td>
+<td style="text-align: center;">DDR(CHIPLINK)</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">0Xc000_0000</td>
+<td style="text-align: center;">1G</td>
+<td style="text-align: center;">timeout</td>
+<td style="text-align: center;">this space is not accessible and access will case the bus to crash</td>
+</tr>
+</tbody>
+</table></section>
 <section id="chiplink-module">
 <h4>3.4.4 Chiplink Module<a class="headerlink" href="#chiplink-module" title="Link to this heading"></a></h4>
 <p>ChipLink is a low-speed interchip bus communication protocol (between FPGA and SoC) proposed by SiFive, which is mainly used for shard transmission and recombination of AXI4 requests sent by SoC to reliably access hardware logic resources on FPGA. The ChipLink controller Verilog code on the FPGA core board was generated by Chisel and has been emulated on the VCS.</p>
@@ -2473,16 +4552,41 @@ Clock and reset time sequence diagram
 </section>
 <section id="serial-terminal-setup">
 <h4>3.6.3 Serial Terminal Setup<a class="headerlink" href="#serial-terminal-setup" title="Link to this heading"></a></h4>
-<p>Open a terminal connection from the host to the MEISHAV100 VC707 FPGA development board using programs such as Minicom or Screen on Linux, or MobaXterm on Windows. Set the parameters as shown below.<br />|Parameter|Value|<br />|:-:|:-:|<br />|Speed|115200|<br />|Parity|None|<br />|Data bits|8|<br />|Stop bits|1|<br />|Hardware Flow|None|</p>
-</section>
-</section>
-<section id="prototype-operation">
-<h3>3.7 Prototype Operation<a class="headerlink" href="#prototype-operation" title="Link to this heading"></a></h3>
-<section id="reset-sequence">
-<h4>3.7.1 Reset Sequence<a class="headerlink" href="#reset-sequence" title="Link to this heading"></a></h4>
-<p>After reset button is pushed, the signal is converted to an internal system reset with zero active level.</p>
-<p>If there is DDR controller,system reset is used for MIG XILINX IP core first.Until the initialization signal of the DDR controller is raised, then the DDR initialization is completed. The reset signal will only be used by the core.</p>
-</section>
+<p>Open a terminal connection from the host to the MEISHAV100 VC707 FPGA development board using programs such as Minicom or Screen on Linux, or MobaXterm on Windows. Set the parameters as shown below.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Parameter</th>
+<th style="text-align: center;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Speed</td>
+<td style="text-align: center;">115200</td>
+</tr>
+<tr>
+<td style="text-align: center;">Parity</td>
+<td style="text-align: center;">None</td>
+</tr>
+<tr>
+<td style="text-align: center;">Data bits</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr>
+<td style="text-align: center;">Stop bits</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">Hardware Flow</td>
+<td style="text-align: center;">None</td>
+</tr>
+</tbody>
+</table>
+<h3>3.7 Prototype Operation</h3>
+<h4>3.7.1 Reset Sequence</h4>
+<p>After reset button is pushed, the signal is converted to an internal system reset with zero active level.  </p>
+<p>If there is DDR controller,system reset is used for MIG XILINX IP core first.Until the initialization signal of the DDR controller is raised, then the DDR initialization is completed. The reset signal will only be used by the core.   </p></section>
 <section id="booting-os-from-an-sd-card">
 <h4>3.7.2 Booting OS from an SD Card<a class="headerlink" href="#booting-os-from-an-sd-card" title="Link to this heading"></a></h4>
 <p>Micro SD card allows to store both OpenBoot and OS image on it.Entering the OS with the sd card requires configured the clock frequency of uart and spi, and the default clock frequency of the processor is 50m. We have provided the pre-compiled linux systems that you can write into the sd card to run the linux system. Since you are unable to connect to the network on FPGA VC707, if you need to download the file on linux, you need to download the file into the linux system in the PC and write linux to the sd card.</p>
@@ -2627,19 +4731,87 @@ MEISHAV100.dts file, add the device tree of the corresponding device, and genera
 <section id="not-specifying-ip">
 <h6>4.1.2.3.1 Not Specifying IP<a class="headerlink" href="#not-specifying-ip" title="Link to this heading"></a></h6>
 <p>By entering the parameters in the input_data.csv file (in the format of the table below) and running the . /run_memaker.sh 2 command, a report in txt format can be generated according to the parameters in the first line, which covers all satisfied parameters of memory (such as area and read time).</p>
-<p>| proc  | type | word | bit  | byte | ringtype | cksr | datasr | load |
-| :—–: | :—-: | :—-: | :—-: | :—-: | :——–: | :—-: | :——: | :—-: |
-| fsh0l | 1P   | 64   | 21   | 4    | ringless | 0.4  | 0.4    | 0.3  |
-| fsh0l | 1P   | 8192 | 8    | 8    | ringless | 0.4  | 0.4    | 0.3  |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">proc</th>
+<th style="text-align: center;">type</th>
+<th style="text-align: center;">word</th>
+<th style="text-align: center;">bit</th>
+<th style="text-align: center;">byte</th>
+<th style="text-align: center;">ringtype</th>
+<th style="text-align: center;">cksr</th>
+<th style="text-align: center;">datasr</th>
+<th style="text-align: center;">load</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">fsh0l</td>
+<td style="text-align: center;">1P</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">ringless</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">fsh0l</td>
+<td style="text-align: center;">1P</td>
+<td style="text-align: center;">8192</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">ringless</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.3</td>
+</tr>
+</tbody>
+</table></section>
 <section id="specifying-ip">
 <h6>4.1.2.3.2 Specifying IP<a class="headerlink" href="#specifying-ip" title="Link to this heading"></a></h6>
 <p>Enter the parameters in input_ip.csv (in the form of the table below) and run the . /run_ip.sh 3 command to generate the verilog file and library file for the specified IP according to the parameters in the second line</p>
-<p>| ip            | word | bit  | byte | mux  | ringtype | cksr | datasr | load |
-| :————-: | :—-: | :—-: | :—-: | :—-: | :——–: | :—-: | :——: | :—-: |
-| FSH0L_B_SHLVT | 64   | 21   | 4    | 4    | ringless | 0.4  | 0.4    | 0.3  |
-| FSH0L_G_SHLVT | 8192 | 8    | 8    | 8    | ringless | 0.4  | 0.4    | 0.3  |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">ip</th>
+<th style="text-align: center;">word</th>
+<th style="text-align: center;">bit</th>
+<th style="text-align: center;">byte</th>
+<th style="text-align: center;">mux</th>
+<th style="text-align: center;">ringtype</th>
+<th style="text-align: center;">cksr</th>
+<th style="text-align: center;">datasr</th>
+<th style="text-align: center;">load</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">FSH0L_B_SHLVT</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">ringless</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">FSH0L_G_SHLVT</td>
+<td style="text-align: center;">8192</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">ringless</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.3</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="report-output">
 <h5>4.1.2.4 Report Output<a class="headerlink" href="#report-output" title="Link to this heading"></a></h5>
@@ -2680,107 +4852,479 @@ MEISHAV100.dts file, add the device tree of the corresponding device, and genera
 <h4>4.2.2 Selection of Specific I/O Cells<a class="headerlink" href="#selection-of-specific-i-o-cells" title="Link to this heading"></a></h4>
 <p>The I/O cell types were determined based on pin frequency and functional requirements of the project. Pin frequencies range from 25 MHz to 300 MHz, with the need for differential clocking. Ultimately, three I/O cells were selected.</p>
 <p>The table below lists the I/O cells selected for this project.</p>
-<p>| cell name                                                    | function                                              | sizes               | voltage&amp;frequency                            |
-|:————————-: | :—————-:| :———: |:————-:|
-| ZTRNE4GS<br />(FOH0L_QRS25_TMVH33L18<br />_GENERIC_POC_IO CELL LIBRARY) | Programmable 4.0 mA ~ 16 mA CMOS bidirectional buffer | 24.92μm x 169.4μm   | 3.3V:150MHz<br />2.5V:100MHz<br />1.8V:80MHz |
-| WOSSTLECDLK<br />(FOH0L_QRS25_T18<br />_SSTL18A_IO CELL LIBRARY) | Differential bidirectional buffer                     | 70 µm x 252.98 µm   | 1.8v:supports DDR2 SRAM interface            |
-| WRNE4GSLAX250<br />(FOH0L_QRS25_T18_GENERIC<br />_POC_IO_250 CELL LIBRARY SPECIFICATION) | Programmable 4.0 mA ~ 16 mA CMOS bidirectional buffer | 29.96 μm x 169.4 μm | 1.8v:250Mhz                                  |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">cell name</th>
+<th style="text-align: center;">function</th>
+<th style="text-align: center;">sizes</th>
+<th style="text-align: center;">voltage&amp;frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">ZTRNE4GS<br />(FOH0L_QRS25_TMVH33L18<br />_GENERIC_POC_IO CELL LIBRARY)</td>
+<td style="text-align: center;">Programmable 4.0 mA ~ 16 mA CMOS bidirectional buffer</td>
+<td style="text-align: center;">24.92μm x 169.4μm</td>
+<td style="text-align: center;">3.3V:150MHz<br />2.5V:100MHz<br />1.8V:80MHz</td>
+</tr>
+<tr>
+<td style="text-align: center;">WOSSTLECDLK<br />(FOH0L_QRS25_T18<br />_SSTL18A_IO CELL LIBRARY)</td>
+<td style="text-align: center;">Differential bidirectional buffer</td>
+<td style="text-align: center;">70 µm x 252.98 µm</td>
+<td style="text-align: center;">1.8v:supports DDR2 SRAM interface</td>
+</tr>
+<tr>
+<td style="text-align: center;">WRNE4GSLAX250<br />(FOH0L_QRS25_T18_GENERIC<br />_POC_IO_250 CELL LIBRARY SPECIFICATION)</td>
+<td style="text-align: center;">Programmable 4.0 mA ~ 16 mA CMOS bidirectional buffer</td>
+<td style="text-align: center;">29.96 μm x 169.4 μm</td>
+<td style="text-align: center;">1.8v:250Mhz</td>
+</tr>
+</tbody>
+</table></section>
 <section id="the-truth-table-for-i-o-selection">
 <h4>4.2.3 The truth table for I/O selection<a class="headerlink" href="#the-truth-table-for-i-o-selection" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong>ZTRNE4GSLA(WRNE4GSLAX250)</strong></p></li>
 </ul>
 <p>The table below summarizes the function and specific values for each pin</p>
-<p>| E    | Output   |
-| :—-: | :——–: |
-| 0    | disabled |
-| 1    | enabled  |</p>
-<p>| IE   | Input    |
-| :—-: | :——–: |
-| 0    | disabled |
-| 1    | enabled  |</p>
-<p>| SR   | Slew rate |
-| :—-:| :———: |
-| 0    | fast      |
-| 1    | slow      |</p>
-<p>| SMT  | input           |
-| :—-: | :—————: |
-| 0    | normal          |
-| 1    | schmitt-trigger |</p>
-<p>| PU   | PD   | Pull-up/Pull-down       |
-| :—-: | :—-: | :———————–: |
-| 0    | 0    | None                    |
-| 1    | 0    | 75-kΩ pull-up           |
-| 0    | 1    | 75-kΩ pull-down         |
-| 1    | 1    | keeper at IE=1          |
-| 1    | 1    | 75-kΩ pull-down at IE=0 |</p>
-<p>| E8   | E4   | driving capability |
-| :—-: | :—-: | :——————: |
-| 0    | 0    | 4<em>X                |
-| 0    | 1    | 8</em>X                |
-| 1    | 0    | 12<em>X               |
-| 1    | 1    | 16</em>X               |</p>
-<p>The following table represents the truth table for the selected I/O types</p>
-<p>| I    | E    | IO          | IE   | O    |
-| :—-: | :—-: | :———–: | :—-: | :—-: |
-| 0    | 1    | 0           | 1    | 0    |
-| 1    | 1    | 1           | 1    | 1    |
-| 0    | 1    | 0           | 0    | 0    |
-| 1    | 1    | 1           | 0    | 0    |
-| X    | 0    | Z           | 1    | X    |
-| X    | 0    | 1           | 1    | 1    |
-| X    | 0    | 0           | 1    | 0    |
-| X    | 0    | pull-down   | 1    | 0    |
-| X    | 0    | pull-uo     | 1    | 1    |
-| X    | 0    | none/keeper | 1    | IO   |
-| X    | 0    | X           | 0    | 0    |</p>
-<ul class="simple">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">E</th>
+<th style="text-align: center;">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">disabled</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">enabled</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">IE</th>
+<th style="text-align: center;">Input</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">disabled</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">enabled</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">SR</th>
+<th style="text-align: center;">Slew rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">fast</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">slow</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">SMT</th>
+<th style="text-align: center;">input</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">normal</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">schmitt-trigger</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">PU</th>
+<th style="text-align: center;">PD</th>
+<th style="text-align: center;">Pull-up/Pull-down</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">None</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">75-kΩ pull-up</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">75-kΩ pull-down</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">keeper at IE=1</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">75-kΩ pull-down at IE=0</td>
+</tr>
+</tbody>
+</table><table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">E8</th>
+<th style="text-align: center;">E4</th>
+<th style="text-align: center;">driving capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">4*X</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">8*X</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">12*X</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">16*X</td>
+</tr>
+</tbody>
+</table><p>The following table represents the truth table for the selected I/O types</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">I</th>
+<th style="text-align: center;">E</th>
+<th style="text-align: center;">IO</th>
+<th style="text-align: center;">IE</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Z</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">pull-down</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">pull-uo</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">none/keeper</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">IO</td>
+</tr>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+</tbody>
+</table><ul class="simple">
 <li><p><strong>WOSSTLECDLK</strong></p></li>
 </ul>
 <p>The table below summarizes the function and specific values for each pin</p>
-<p>| 信号        | 功能                                                         |
-| :———–: | :———————–: |
-| I           | Non-inverting input signal of the driver                     |
-| E           | Output enable（‘1’enabled）                                  |
-| IO          | Input pad of the receiver/Output pad of the driver           |
-| IOB         | Inverted input pad of the receiver/Inverted output pad of the driver |
-| E3V         | VCCK power-down detection pin（‘1’enabled）                  |
-| SIO         | Single-ended mode/Differential mode selection pin（‘0’differential input mode/differential output mode） |
-| NLEG5~NLEG0 | NMOS driving compensation control pins（Typ.default setting：010100） |
-| PLEG5~PLEG0 | PMOS driving compensation control pins（Typ.default setting：010100） |
-| REF         | Reference voltage of the single-ended receiver               |
-| IE          | Input enable pin（‘1’enabled）                               |
-| O           | Output signal of the receiver                                |
-| RONMD2~0    | Output resistance selection pin                              |
-| ODTEN       | ODT enable pin（‘1’enabled）                                 |
-| ODTMD2~0    | ODT resistance selection                                     |
-| D15V        | I/O power selection pin（’0‘：1.2v or 1.35v     ’1‘：1.5v or 1.8v） |
-| MDDR1       | MDDR mode selection pin（’0’：DDR2 mode    ‘1’：LPDDR(MDDR)mode） |</p>
-<p>the selection of the output driver impedance</p>
-<p>| RONMD2 | RONMD1 | RONMD0 | Description |
-| :——: | :——: | :——: | :———–: |
-| 0      | 0      | 0      | 120Ω        |
-| 0      | 0      | 1      | 120Ω        |
-| 0      | 1      | 0      | 80Ω         |
-| 0      | 1      | 1      | 60Ω         |
-| 1      | 0      | 0      | Reserved    |
-| 1      | 0      | 1      | 48Ω         |
-| 1      | 1      | 0      | 40Ω         |
-| 1      | 1      | 1      | 34.3Ω       |</p>
-<p>On-die termination</p>
-<p>| ODTMD2 | ODTMD1 | ODTMD0 | ODTEN | Description     |
-| :——: | :——: | :——: | :—–: | :—————: |
-| X      | X      | X      | 0     | ODT is disabled |
-| 0      | 0      | 0      | 1     | ODT is disabled |
-| 0      | 0      | 1      | 1     | 120Ω            |
-| 0      | 1      | 0      | 1     | 60Ω             |
-| 0      | 1      | 1      | 1     | 40Ω             |
-| 1      | 0      | 0      | 1     | Reserved        |
-| 1      | 0      | 1      | 1     | 30Ω             |
-| 1      | 1      | 0      | 1     | 24Ω             |
-| 1      | 1      | 1      | 1     | 20Ω             |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">信号</th>
+<th style="text-align: center;">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">Non-inverting input signal of the driver</td>
+</tr>
+<tr>
+<td style="text-align: center;">E</td>
+<td style="text-align: center;">Output enable（‘1’enabled）</td>
+</tr>
+<tr>
+<td style="text-align: center;">IO</td>
+<td style="text-align: center;">Input pad of the receiver/Output pad of the driver</td>
+</tr>
+<tr>
+<td style="text-align: center;">IOB</td>
+<td style="text-align: center;">Inverted input pad of the receiver/Inverted output pad of the driver</td>
+</tr>
+<tr>
+<td style="text-align: center;">E3V</td>
+<td style="text-align: center;">VCCK power-down detection pin（‘1’enabled）</td>
+</tr>
+<tr>
+<td style="text-align: center;">SIO</td>
+<td style="text-align: center;">Single-ended mode/Differential mode selection pin（‘0’differential input mode/differential output mode）</td>
+</tr>
+<tr>
+<td style="text-align: center;">NLEG5~NLEG0</td>
+<td style="text-align: center;">NMOS driving compensation control pins（Typ.default setting：010100）</td>
+</tr>
+<tr>
+<td style="text-align: center;">PLEG5~PLEG0</td>
+<td style="text-align: center;">PMOS driving compensation control pins（Typ.default setting：010100）</td>
+</tr>
+<tr>
+<td style="text-align: center;">REF</td>
+<td style="text-align: center;">Reference voltage of the single-ended receiver</td>
+</tr>
+<tr>
+<td style="text-align: center;">IE</td>
+<td style="text-align: center;">Input enable pin（‘1’enabled）</td>
+</tr>
+<tr>
+<td style="text-align: center;">O</td>
+<td style="text-align: center;">Output signal of the receiver</td>
+</tr>
+<tr>
+<td style="text-align: center;">RONMD2~0</td>
+<td style="text-align: center;">Output resistance selection pin</td>
+</tr>
+<tr>
+<td style="text-align: center;">ODTEN</td>
+<td style="text-align: center;">ODT enable pin（‘1’enabled）</td>
+</tr>
+<tr>
+<td style="text-align: center;">ODTMD2~0</td>
+<td style="text-align: center;">ODT resistance selection</td>
+</tr>
+<tr>
+<td style="text-align: center;">D15V</td>
+<td style="text-align: center;">I/O power selection pin（’0‘：1.2v or 1.35v     ’1‘：1.5v or 1.8v）</td>
+</tr>
+<tr>
+<td style="text-align: center;">MDDR1</td>
+<td style="text-align: center;">MDDR mode selection pin（’0’：DDR2 mode    ‘1’：LPDDR(MDDR)mode）</td>
+</tr>
+</tbody>
+</table><p>the selection of the output driver impedance</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">RONMD2</th>
+<th style="text-align: center;">RONMD1</th>
+<th style="text-align: center;">RONMD0</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">120Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">120Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">80Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">60Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">48Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">40Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">34.3Ω</td>
+</tr>
+</tbody>
+</table><p>On-die termination</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">ODTMD2</th>
+<th style="text-align: center;">ODTMD1</th>
+<th style="text-align: center;">ODTMD0</th>
+<th style="text-align: center;">ODTEN</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">ODT is disabled</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">ODT is disabled</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">120Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">60Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">40Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Reserved</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">30Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">24Ω</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">20Ω</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 </section>
 <section id="device-sd">
@@ -2855,14 +5399,42 @@ A maximum clock of 25MHz is required in Data Transfer Mode.</p>
 <section id="id58">
 <h6>Top level testbench<a class="headerlink" href="#id58" title="Link to this heading"></a></h6>
 <p>The top-level testbed is located in ‘\trunk\hw\d2dv100_top\dv’ and the SD card model is instantiated in dut_MEISHAV100_TOP_wrapper.sv.</p>
-<p>| SD card signals | SD card signals given by the top-level module |  I/O   |
-| :————-: | :——————————————-: | :—-: |
-|      sclk       |                    spi_clk                    | output |
-|      mosi       |                     MOSI                      | output |
-|      miso       |                     MISO                      | input  |
-|       ncs       |                     SS_n                      | output |
-|      rstn       |                   spi_rst_n                   | output |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">SD card signals</th>
+<th style="text-align: center;">SD card signals given by the top-level module</th>
+<th style="text-align: center;">I/O</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">sclk</td>
+<td style="text-align: center;">spi_clk</td>
+<td style="text-align: center;">output</td>
+</tr>
+<tr>
+<td style="text-align: center;">mosi</td>
+<td style="text-align: center;">MOSI</td>
+<td style="text-align: center;">output</td>
+</tr>
+<tr>
+<td style="text-align: center;">miso</td>
+<td style="text-align: center;">MISO</td>
+<td style="text-align: center;">input</td>
+</tr>
+<tr>
+<td style="text-align: center;">ncs</td>
+<td style="text-align: center;">SS_n</td>
+<td style="text-align: center;">output</td>
+</tr>
+<tr>
+<td style="text-align: center;">rstn</td>
+<td style="text-align: center;">spi_rst_n</td>
+<td style="text-align: center;">output</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 </section>
 <section id="stimulus-strategy">
@@ -3067,118 +5639,440 @@ A maximum clock of 25MHz is required in Data Transfer Mode.</p>
 <h3>5.4 Hardware Interfaces<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
 <section id="sd-card-i-o">
 <h4>5.4.1 SD card I/O<a class="headerlink" href="#sd-card-i-o" title="Link to this heading"></a></h4>
-<p>| Pin name | Direction |                       Description                        |
-| :——: | :——-: | :——————————————————: |
-|   sclk   |   input   |                      SD Card Clock                       |
-|   ncs    |   input   |                    chip select signal                    |
-|   mosi   |   input   |  SD card input, host sends commands and data to SD card  |
-|   miso   |  output   | SD card output to send data or response to host computer |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Pin name</th>
+<th style="text-align: center;">Direction</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">sclk</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">SD Card Clock</td>
+</tr>
+<tr>
+<td style="text-align: center;">ncs</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">chip select signal</td>
+</tr>
+<tr>
+<td style="text-align: center;">mosi</td>
+<td style="text-align: center;">input</td>
+<td style="text-align: center;">SD card input, host sends commands and data to SD card</td>
+</tr>
+<tr>
+<td style="text-align: center;">miso</td>
+<td style="text-align: center;">output</td>
+<td style="text-align: center;">SD card output to send data or response to host computer</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="id61">
 <h3>5.5 Registers<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
-<p>|   Name    | Offset | bit width |                         Description                          |
-| :——-: | :—-: | :——-: | :———————————————————-: |
-|    csd    |   \    |    128    | The CSD is card-specific data register that provides information. |
-|    cid    |   \    |    128    | The CID (Card Identification) register contains the card identification information. The value of the CID register is vendor specific. |
-|    ocr    |   \    |    32     | This register describes the operating voltage range and status bit in the power supply.This model is SDHC with a voltage range of 2.7-3.6V |
-|    scr    |   \    |    64     | SCR (SD Card Configuration Register) provides information on the SD memory card’s special features. |
-|    st     |  0x0   |     4     |               Record SD card state transitions               |
-|    ist    |  0x0   |     3     |  Recording state transitions during SD card initialisation   |
-| init_done |  0x0   |     1     |                Initialisation completion flag                |
-|   token   |  0x0   |     8     |          Record the start token for receiving data           |
-| multi_st  |  0x0   |     2     | State machine for continuous data writing, implementation of interrupt commands |</p>
-<section id="two-dimensional-array">
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Offset</th>
+<th style="text-align: center;">bit width</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">csd</td>
+<td style="text-align: center;">\</td>
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">The CSD is card-specific data register that provides information.</td>
+</tr>
+<tr>
+<td style="text-align: center;">cid</td>
+<td style="text-align: center;">\</td>
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">The CID (Card Identification) register contains the card identification information. The value of the CID register is vendor specific.</td>
+</tr>
+<tr>
+<td style="text-align: center;">ocr</td>
+<td style="text-align: center;">\</td>
+<td style="text-align: center;">32</td>
+<td style="text-align: center;">This register describes the operating voltage range and status bit in the power supply.This model is SDHC with a voltage range of 2.7-3.6V</td>
+</tr>
+<tr>
+<td style="text-align: center;">scr</td>
+<td style="text-align: center;">\</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">SCR (SD Card Configuration Register) provides information on the SD memory card’s special features.</td>
+</tr>
+<tr>
+<td style="text-align: center;">st</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Record SD card state transitions</td>
+</tr>
+<tr>
+<td style="text-align: center;">ist</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Recording state transitions during SD card initialisation</td>
+</tr>
+<tr>
+<td style="text-align: center;">init_done</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Initialisation completion flag</td>
+</tr>
+<tr>
+<td style="text-align: center;">token</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Record the start token for receiving data</td>
+</tr>
+<tr>
+<td style="text-align: center;">multi_st</td>
+<td style="text-align: center;">0x0</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">State machine for continuous data writing, implementation of interrupt commands</td>
+</tr>
+</tbody>
+</table><section id="two-dimensional-array">
 <h4>two-dimensional array<a class="headerlink" href="#two-dimensional-array" title="Link to this heading"></a></h4>
-<p>|   Name    | bit width |      bit depth       |                       Description                        |
-| :——-: | :——-: | :——————: | :——————————————————: |
-| flash_mem |     8     | 32*1024*1024*1024 | Simulates the data storage area of an SD card, size 32GB |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">bit width</th>
+<th style="text-align: center;">bit depth</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">flash_mem</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">32*1024*1024*1024</td>
+<td style="text-align: center;">Simulates the data storage area of an SD card, size 32GB</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 <section id="id62">
 <h3>5.6 Checklist<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
 <section id="design">
 <h4>Design<a class="headerlink" href="#design" title="Link to this heading"></a></h4>
-<p>| Command   | Result |
-| :———: | :——: |
-| cmd0      | done   |
-| cmd1      | waived |
-| cmd6      | waived |
-| cmd8      | done   |
-| cmd9      | done   |
-| cmd10     | done   |
-| cmd12     | done   |
-| cmd13     | waived |
-| cmd16     | done   |
-| cmd17     | done   |
-| cmd18     | doen   |
-| cmd24     | done   |
-| cmd25     | done   |
-| cmd27     | waived |
-| cmd28     | waived |
-| cmd29     | waived |
-| cmd30     | waived |
-| cmd32     | waived |
-| cmd33     | waived |
-| cmd38     | waived |
-| cmd42     | waived |
-| cmd55     | done   |
-| cmd56     | waived |
-| cmd58     | done   |
-| cmd59     | waived |
-| acmd13    | done   |
-| acmd18    | waived |
-| acmd22    | waived |
-| acmd23    | waived |
-| acmd25    | waived |
-| acmd26    | waived |
-| acmd38    | waived |
-| acmd41    | done   |
-| acmd42    | waived |
-| acmd43-49 | waived |
-| acmd51    | done   |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Command</th>
+<th style="text-align: center;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">cmd0</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd1</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd6</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd8</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd9</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd10</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd12</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd13</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd16</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd17</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd18</td>
+<td style="text-align: center;">doen</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd24</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd25</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd27</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd28</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd29</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd30</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd32</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd33</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd38</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd42</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd55</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd56</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd58</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd59</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd13</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd18</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd22</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd23</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd25</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd26</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd38</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd41</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd42</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd43-49</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd51</td>
+<td style="text-align: center;">done</td>
+</tr>
+</tbody>
+</table></section>
 <section id="verify">
 <h4>Verify<a class="headerlink" href="#verify" title="Link to this heading"></a></h4>
-<p>| Command   | Result    |
-| :———: | :———: |
-| cmd0      | done      |
-| cmd1      | waived    |
-| cmd6      | waived    |
-| cmd8      | done      |
-| cmd9      | not start |
-| cmd10     | not start |
-| cmd12     | done      |
-| cmd13     | waived    |
-| cmd16     | done      |
-| cmd17     | done      |
-| cmd18     | doen      |
-| cmd24     | done      |
-| cmd25     | done      |
-| cmd27     | waived    |
-| cmd28     | waived    |
-| cmd29     | waived    |
-| cmd30     | waived    |
-| cmd32     | waived    |
-| cmd33     | waived    |
-| cmd38     | waived    |
-| cmd42     | waived    |
-| cmd55     | done      |
-| cmd56     | waived    |
-| cmd58     | done      |
-| cmd59     | waived    |
-| acmd13    | not start |
-| acmd18    | waived    |
-| acmd22    | waived    |
-| acmd23    | waived    |
-| acmd25    | waived    |
-| acmd26    | waived    |
-| acmd38    | waived    |
-| acmd41    | done      |
-| acmd42    | waived    |
-| acmd43-49 | waived    |
-| acmd51    | not start |</p>
-</section>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Command</th>
+<th style="text-align: center;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">cmd0</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd1</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd6</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd8</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd9</td>
+<td style="text-align: center;">not start</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd10</td>
+<td style="text-align: center;">not start</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd12</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd13</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd16</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd17</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd18</td>
+<td style="text-align: center;">doen</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd24</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd25</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd27</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd28</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd29</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd30</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd32</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd33</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd38</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd42</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd55</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd56</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd58</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">cmd59</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd13</td>
+<td style="text-align: center;">not start</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd18</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd22</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd23</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd25</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd26</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd38</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd41</td>
+<td style="text-align: center;">done</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd42</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd43-49</td>
+<td style="text-align: center;">waived</td>
+</tr>
+<tr>
+<td style="text-align: center;">acmd51</td>
+<td style="text-align: center;">not start</td>
+</tr>
+</tbody>
+</table></section>
 </section>
 </section>
 </section>

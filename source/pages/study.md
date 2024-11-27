@@ -3,37 +3,39 @@
 ### 1.1 Project    
 Design of a reconfigurable multi-core heterogeneous processor utilising RISC-V architecture.   
  
-<div align=center>  
-<img src="photo/image-7.png" width="500"  alt="UART">      
+<div align="center">  
+<img src="photo/image-7.png"  alt="Design Architecture" width="500px">      
 
 Design Architecture
 <div>
 <div align=left><div> 
  
-#### Memory Map
-Base | Size（B） | Description | Notes|
-:-----------: | :-----------: | :-----------: | :-----------:|
-0x0000_0000 | 4K | debug-controller | 
-0x0000_3000 | 4K | error-device | 
-0x0001_0000 | 8K | Mask ROM (32 KiB) | 
-0x0200_0000 | 64K | CLINT |  
-0x0C00_0000 | 4M | PLIC |  
-0x5000_0000 | 0x6000_0000(256M) | PCIE HOST 空间 |  
-0x5000_0000 | 512K | on chip sram |  
-0x5100_0000 | 4K | soc_lsys |  
-0x5200_0000 | 4K | spi_1 |  
-0x6000_0000 | 0x6400_0000 | TIMEOUT |  
-0x20_0000_0000 | 0x20_0800_0000/128M | pci ctrl 空间 timeout |  
-0x20_0800_0000 | 0x20_1000_0000 | TIME_OUT |  
-0x20_1000_0000 | 0x21_000_0000 | TIME_OUT |  
-0x21_0000_0000 | 0x3F_FFFF_FFFF | TIME_OUT |  
-0x6400_0000 | 4K | serial | 不支持narrow，sparse
-0x6400_1000 | 4K | spi_0 | 不支持narrow，sparse
-0x6400_2000 | 4K | gpio | 不支持narrow，sparse
-0x8000_0000 | 512M | CHIPLINK | 
-0xA000_0000 | 512M | DDR（SDRAM） |  
-0xC000_0000 | 1G | TIME_OUT | 注意到这段空间不允许访问，访问会导致总线挂死
-MIG_CHIPLINK_SLAVE | 1 MIG真实空间0x8000_0000 - 0xC000_0000可remap到如下空间：0x1000_*0000 - 0xE000_0000*（13*256=3328M） | 1 slave口需要地址remap，最高4bit可以控制，连接到SOC_LSYS，默认最高4bit改成1 | 集成chiplink到meishav100版本，用于后续验证[https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail](https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail)
+#### Memory Map    
+
+|Base | Size（B）| Description | Notes|  
+|:-----------: | :-----------: | :-----------: | :-----------:|  
+|0x0000_0000 | 4K | debug-controller | |  
+|0x0000_3000 | 4K | error-device ||   
+|0x0001_0000 | 8K | Mask ROM (32 KiB) ||   
+|0x0200_0000 | 64K | CLINT |  |  
+|0x0C00_0000 | 4M | PLIC |  |  
+|0x5000_0000 | 0x6000_0000(256M) | PCIE HOST 空间 ||    
+|0x5000_0000 | 512K | on chip sram |  |  
+|0x5100_0000 | 4K | soc_lsys |  |  
+|0x5200_0000 | 4K | spi_1 |  |  
+|0x6000_0000 | 0x6400_0000 | TIMEOUT ||    
+|0x20_0000_0000 | 0x20_0800_0000/128M | pci ctrl 空间 timeout ||    
+|0x20_0800_0000 | 0x20_1000_0000 | TIME_OUT |  |  
+|0x20_1000_0000 | 0x21_000_0000 | TIME_OUT |  |  
+|0x21_0000_0000 | 0x3F_FFFF_FFFF | TIME_OUT |  |  
+|0x6400_0000 | 4K | serial | 不支持narrow，sparse|  
+|0x6400_1000 | 4K | spi_0 | 不支持narrow，sparse|  
+|0x6400_2000 | 4K | gpio | 不支持narrow，sparse|  
+|0x8000_0000 | 512M | CHIPLINK | |    
+|0xA000_0000 | 512M | DDR（SDRAM） |      
+|0xC000_0000 | 1G | TIME_OUT | 注意到这段空间不允许访问，访问会导致总线挂死|  
+|MIG_CHIPLINK_SLAVE |  MIG真实空间0x8000_0000 - 0xC000_0000可remap到如下空间：0x1000_*0000 - 0xE000_0000*（13*256=3328M） | slave口需要地址remap，最高4bit可以控制，连接到SOC_LSYS，默认最高4bit改成1 | 集成chiplink到meishav100版本，用于后续验证[https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail](https://g-ntwx0319.coding.net/p/v100/assignments/issues/32/detail) | 
+
 ### 1.2 Background  
 The demand for artificial intelligence computing power in unmanned systems has surged significantly, rendering traditional isomorphic computing systems inadequate for the requirements. Multi-core heterogeneous processors have garnered substantial attention due to their formidable computing capabilities. Simultaneously, RISC-V, as a fully open-source instruction set architecture, empowers us to design our own CPUs entirely.   
 
@@ -54,16 +56,16 @@ Completion
 <div>
 <div align=left><div>        
 
-The table below provides a list of the hardware modules we currently possess:    
-  
-| Design | Spec Version |
-| :---: | :---: |
-| GPIO | 1.1.0 |
-| SPI | 1.1.0 |
-| QSPI | 1.1.0 |
-| UART | 1.1.0 |
-| JTAG | 1.1.0|  
-|SRAM|1.1.0|
+The table below provides a list of the hardware modules we currently possess:      
+
+|Design| Spec Version|  
+| :---:| :---:|  
+| GPIO | 1.1.0 |  
+| SPI  | 1.1.0 |  
+| QSPI | 1.1.0 |  
+| UART | 1.1.0 |  
+| JTAG | 1.1.0 |    
+| SRAM | 1.1.0 |  
 
 
 + The chip incorporates GPIO peripherals, which facilitate bidirectional communication with the external environment.
@@ -262,8 +264,9 @@ In `main_phase`, data is written to the register of the UART mainly through the 
   
 Use TL-agent to configure UART control registers, including `DIV`, `TXCTRL`, `RXCTRL` and so on.
 After the configuration, the TL-agent writes the generated data to `uart_txfifo`.
-#### 2.2.4 Hardware Interfaces    
-The following table shows the uart connection method:  
+#### 2.2.4 Hardware Interfaces      
+The following table shows the uart connection method:    
+
 |Master_Port|Slave_Port|  
 |:-:|:-:|  
 |Master_Tx|Slave_Rx|  
@@ -282,33 +285,38 @@ Block Diagram
 
 #### 2.2.5 Registers  
 ##### Control Register       
-A serial port control register is a specialized type of register within communication interfaces, responsible for managing the configuration and control of serial communication lines. These registers are essential for facilitating and overseeing data transfers between devices that employ serial communication protocols.
-offset | Name | Description
-:-----------: | :-----------: | :-----------:|
-0x00 | txdata | Transmit data register
-0x04 | rxdata | Receiver data register
-0x08 | txctrl | Transmit control register
-0x0C | rxctrl | Receive control register
-0X10 | ie | UART interrupt enable
-0X14 | ip | UART interrupt pending
+A serial port control register is a specialized type of register within communication interfaces, responsible for managing the configuration and control of serial communication lines. These registers are essential for facilitating and overseeing data transfers between devices that employ serial communication protocols.  
+
+offset | Name | Description  
+:-----------: | :-----------: | :-----------:   
+0x00 | txdata | Transmit data register  
+0x04 | rxdata | Receiver data register  
+0x08 | txctrl | Transmit control register  
+0x0C | rxctrl | Receive control register   
+0X10 | ie | UART interrupt enable  
+0X14 | ip | UART interrupt pending  
 0X18 | div | Baud rate divisor      
 
  The functions typically managed by these registers include:
 ##### Baud Rate Divisor Register(div)  
 It determines the speed of data transmission in bits per second (baud). The div register designates the divisor employed for the baud rate generation of the Tx and Rx channels. The input clock is derived from the bus clock. The reset value of the register is configured to div_init, and, given the anticipated frequency of the tlclk, it is calibrated to yield a 115200 baud output upon reset.  
+    
 
-|tlclk (MHz) | Target Baud (Hz) | Divisor | Actual Baud (Hz) | Error (%)|   
-|:-----------:| :-----------: | :-----------:| :-----------:| :-----------:
-|500 | 31250 | 16000 | 31250 | 0|  
-|500 | 115200 | 4340 | 115207 | 0.0064|
-|500 | 250000 | 2000 | 250000 | 0|
-|500 | 1843200 | 271 | 1845018 | 0.099|
-|750 | 31250 | 24000 | 31250 | 0|
-|750 | 115200 | 6510 | 6510 | 0.0064|
-|750 | 250000 | 3000 | 3000 | 0|
-|750 | 1843200 | 407 | 407 | 0.024 | 
+|tlclk (MHz) | Target Baud (Hz) | Divisor | Actual Baud (Hz) | Error (%)|       
+|:-----------:| :-----------: | :-----------:| :-----------:| :-----------:|    
+|500 | 31250 | 16000 | 31250 | 0|      
+|500 | 115200 | 4340 | 115207 | 0.0064|    
+|500 | 250000 | 2000 | 250000 | 0|    
+|500 | 1843200 | 271 | 1845018 | 0.099|    
+|750 | 31250 | 24000 | 31250 | 0|    
+|750 | 115200 | 6510 | 6510 | 0.0064|    
+|750 | 250000 | 3000 | 3000 | 0|    
+|750 | 1843200 | 407 | 407 | 0.024 |   
+  
+
 ##### Transmit Data Register (txdata)  
-If the FIFO is capable of accepting a new entry, then writing to the txdata register queues the characters contained within the data field to the transmitting FIFO. Reading from txdata returns the current value of the full flag and sets the data field to zero. The full flag signifies whether the transmitting FIFO can accommodate the new entry. Post-setting, writes to the data field are disregarded. 
+If the FIFO is capable of accepting a new entry, then writing to the txdata register queues the characters contained within the data field to the transmitting FIFO. Reading from txdata returns the current value of the full flag and sets the data field to zero. The full flag signifies whether the transmitting FIFO can accommodate the new entry. Post-setting, writes to the data field are disregarded.   
+
 **Bits** | **Field Name** | **Attr.**
 :-----------: | :-----------: | :-----------:
 [7:0] | data | RW
@@ -322,26 +330,32 @@ The read rxdata register extracts a character from the received FIFO and returns
 :-----------: | :-----------: | :-----------:
 [7:0] | data | RW
 [30:8] | Reserved |  
-31 | full | RO
+31 | full | RO  
+
 ##### Interrupt Registers (ip and ie)
-The ip register is a read-only register that indicates pending interrupt conditions, while the read-write ie register controls which UART interrupts are enabled. ie was reset to 0.
+The ip register is a read-only register that indicates pending interrupt conditions, while the read-write ie register controls which UART interrupts are enabled. ie was reset to 0.  
+
 **Bits** | **Field Name** | **Attr.**  
 :-----------: | :-----------: | :-----------:  
 0 | txwm | RW  
 1 | rxwm | RW  
-[31:2] | Reserved |  
+[31:2] | Reserved |    
+
 #### 2.2.6 Checklist
-##### Design Checklist    
+##### Design Checklist      
+
 |Type|Item|Resolution|    
 |:-:|:-:|:-:|
 |Documentation|UART SPEC|Done|  
 |RTL|Design|Done|    
 
-##### Verification Checklist 
+##### Verification Checklist    
+
 |Type|Item|Resolution|    
 |:-:|:-:|:-:|
 |Documentation|VIP|Done|  
-|RTL|Design|Done|  
+|RTL|Design|Done|    
+
 ### 2.3 SPI    
 #### 2.3.1 SPI Technical Specification    
 ![alt text](photo/image-25.png)
@@ -549,14 +563,16 @@ Bits | Fidle Name | Attr. | Rst. | Description
 1 | pol | RW | 0x0 | Serial clock polarity
 [31:2] | Reserved | RW | X | Reserved
 
-Serial Clock Polarity:
+Serial Clock Polarity:  
+
 Value | Description |
 :--: | :--: |
 0 | The SCK signal remains at a logical level of 0 at idle|
 1 |The SCK signal remains at a logical level of 1
 at idle|
 
-Serial Clock Phase：
+Serial Clock Phase：  
+
 Value | Description |
 :--: | :--: |
 0 | Data is sampled on the rising edge of SCK (leading edge) and shifted out on the falling edge of SCK (trailing edge) |
@@ -570,7 +586,8 @@ Bits | Fidle Name | Attr. | Rst. | Description |
 [31:0] | csid | RW | 0x0000_0000 | Chip Select ID |
 
 ###### Chip Select Default Register (csdef)
-The csdef register specifies the idle state (polarity) of the CS pins. For all implemented CS pins, the reset value is set to high.
+The csdef register specifies the idle state (polarity) of the CS pins. For all implemented CS pins, the reset value is set to high.  
+
 Bits | Fidle Name | Attr. | Rst. | Description |
 :--: | :--: | :--: | :--: | :--: |
 [31:0] | csdef | RW | 0x0000_0001 | Chip Select Default Value |
@@ -582,16 +599,19 @@ The csmode register defines the behavior of the hardware chip select, as detaile
 + A different value is written to either csmode or csid.
 + A write to csdef results in a change of state for the selected pin.
 + Direct-mapped flash mode is enabled.  
-  
-Bits | Fidle Name | Attr. | Rst. | Description
-:-----------: | :-----------: | :-----------: | :-----------: | :-----------:
-[1:0] | mode | RW | X | Chip Select Mode
-[31:2] | Reserved | RW | X | Reserved
+    
 
-Value | Name | Description
-:-----------: | :-----------: | :-----------:
-0 | AUTO | Toggle the CS signal at the beginning/end of each frame
-2 | HOLD |Keep the CS signal asserted continuously after the initial frame
+Bits | Fidle Name | Attr. | Rst. | Description  
+:-----------: | :-----------: | :-----------: | :-----------: | :-----------:  
+[1:0] | mode | RW | X | Chip Select Mode  
+[31:2] | Reserved | RW | X | Reserved
+  
+  
+
+Value | Name | Description  
+:-----------: | :-----------: | :-----------:  
+0 | AUTO | Toggle the CS signal at the beginning/end of each frame  
+2 | HOLD |Keep the CS signal asserted continuously after the initial frame  
 3 | OFF | Disable hardware control over the CS signal
 
 
@@ -604,7 +624,8 @@ The delay0 and delay1 registers allow the insertion of arbitrary delays in terms
 - The intercs field specifies the minimum CS idle time between deassertion and reassertion. The reset value is 0x01.
 - The interxfr field specifies the delay between two consecutive frames without deasserting CS. This is applicable only when sckmode is in HOLD or OFF. The reset value is 0x00.
 
-delay0：
+delay0：  
+
 Bits | Fidle Name | Attr. | Rst. | Description |
 :--: | :--: | :--: | :--: | :--: |
 [7:0] | cssck | RW | 0x01 | CS to SCK Delay |
@@ -612,7 +633,8 @@ Bits | Fidle Name | Attr. | Rst. | Description |
 [23:16] | sckcs | RW | 0x01 | SCK to CS Delay |
 [31:24] | Reserved | RW | X | Reserved |
 
-delya1：
+delya1：  
+
 Bits | Fidle Name | Attr. | Rst. | Description |
 :--: | :--: | :--: | :--: | :--: |
 [7:0] | intercs | RW | 0x01 | Minimum CS inactive time |
@@ -626,25 +648,28 @@ The fmt register defines the frame format for transfers initiated via the Progra
 - The len field defines the number of bits per frame, with a permissible range from 0 to 8, inclusive.
 - For SPI0, the reset value of the fmt register is 0x0008 0008, which corresponds to proto = single, dir = Tx, endian = MSB, and len = 8.
 - For SPI1 and SPI2, the reset value of the fmt register is 0x0008 0000, which corresponds to proto = single, dir = Rx, endian = MSB, and len = 8.
-  
-Bits | Fidle Name | Attr. | Rst. | Description
-:-----------: | :-----------: | :-----------: | :-----------: | :-----------:
-[1:0] | proto | RW | 0x0 | SPI Protocol
-2 | endian | RW | 0x0 | SPI endinanness
-3 | dir | RW | 0x1 | SPI I/O Direction
-[15:4] | Reserved | RW | X | Reserved
-[19:16] | len | RW | 0x8 | Number of bits per frame
+    
+
+Bits | Fidle Name | Attr. | Rst. | Description  
+:-----------: | :-----------: | :-----------: | :-----------: | :-----------:  
+[1:0] | proto | RW | 0x0 | SPI Protocol  
+2 | endian | RW | 0x0 | SPI endinanness  
+3 | dir | RW | 0x1 | SPI I/O Direction  
+[15:4] | Reserved | RW | X | Reserved  
+[19:16] | len | RW | 0x8 | Number of bits per frame  
 [31:20] | Reserved | RW | X | Reserved
 
 
-SPI Protocol：
+SPI Protocol：  
+
 Value | Description | Data Pins |
 :--: | :--: |:--: |
 0 | Single | DQ0(MOSI), DQ1(MISO) |
 1 | Dual | DQ0, DQ1|
 2 | Quad | DQ0, DQ1, DQ2, DQ3 |
 
-SPI Endianness：
+SPI Endianness：  
+
 Value | Description |
 :--: | :--: |
 0 | Transmit most-significant bit (MSB) first |
@@ -669,7 +694,8 @@ The full flag is set when the transmit FIFO is ready to accept a new entry; when
 |:-----:|:-----------:|:------:|:-----:|:------------:|
 | [7:0] | data | RW | 0x00 | Transmit Data |
 | [30:8] | Reserved | RW | X | Reserved |
-| 31 | full | RO | X | FIFO full flag |
+| 31 | full | RO | X | FIFO full flag |  
+
 ###### Receive Data Register (rxdata)
 
 Reading the rxdata register dequeues a frame from the receive FIFO.
@@ -738,19 +764,22 @@ The txwm condition is triggered when the number of entries in the transmit FIFO 
 
 The rxwm condition is triggered when the number of entries in the receive FIFO is strictly greater than the count specified by the rxmark register. The pending bit is cleared when the number of dequeued entries is sufficiently small to fall below the watermark.
 
-SPI Interrupt Enable Register (ie):
+SPI Interrupt Enable Register (ie):  
+
 | Bits | Field Name | Attr. | Rst. | Description |
 |:-----:|:-----------:|:------:|:-----:|:------------:|
 | 0 | txwm | RW | 0x0 | Transmit watermark enable |
 | 1 | rxwm | RW | 0x0 | Receive watermark enable |
 | [31:2] | Reserved | RW | X | Reserved |
 
-SPI Watermark Interrupt Pending Register (ip):
+SPI Watermark Interrupt Pending Register (ip):  
+
 | Bits | Field Name | Attr. | Rst. | Description |
 |:-----:|:-----------:|:------:|:-----:|:------------:|
 | 0 | txwm | RO | 0x0 | Transmit watermark pending |
 | 1 | rxwm | RO | 0x0 | Receive watermark pending |
-| [31:2] | Reserved | RW | X | Reserved |  
+| [31:2] | Reserved | RW | X | Reserved |    
+
 #### 2.3.5  Checklist
   
 ### 2.4 JTAG  
@@ -1210,7 +1239,8 @@ JTAG Singal | Top JTAG Singal | I/O
 TCK | jtag_jtag_TCK | input
 TMS | jtag_jtag_TMS | input
 TDI | jtag_jtag_TDI | input
-TDO | jtag_jtag_TDO | output
+TDO | jtag_jtag_TDO | output  
+
 #### 2.4.5 Registers    
 
 ##### 2.4.5.1 Debug Module Debug Bus Registers
@@ -1280,9 +1310,10 @@ vERSION | pARTnUMBER | mANUFLD | 1
 **ManufId:** Bits 6:0 must be the bits 6:0 of the design/manufacturer identification code specified by the JEDEC standard JEP106. Bits 10:7 contain the modulo-16 count of the continuation characters (0x7f) in the same identification code.
 
 ###### 2.4.5.2.2  DTM Control and Status (dtmcs，0x10)
+  
 
 31:18 | 17 | 16 | 15 | 14:12 | 11:10 | 9:4 | 3:0
-:-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------:|
+:-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------:
 0 | dmihardreset | dmireset | 0 | idle | dmistat | abits | version
 
 | Field | Description | Access | Reset |
@@ -1292,7 +1323,8 @@ vERSION | pARTnUMBER | mANUFLD | 1
 | idle | This is a hint to the debugger regarding the minimum number of cycles it should spend in RunTest/Idle after each DMI scan to avoid returning the 'busy' code (dmistat is 3). The debugger must still check dmistat as necessary.  0: No need to enter Run-Test/Idle.   1: Enter Run-Test/Idle and exit immediately. 2: Enter Run-Test/Idle, stay for 1 cycle, then leave. | R  | Preset |
 | dmistat | 0: No error. 1: Reserved. Interpretation is the same as for 2. 2: Operation failed (caused by op (2)). 3: Attempted operation while a DMI access is still in progress (caused by op (3)). | R      | 0      |
 | abits | The size of the address in dmi. | R      | Preset |
-| version | 0: Version described in specification version 0.11. 1: Version described in specification version 0.13. 15: Version not described in any available version of this specification. | R  | 1 |
+| version | 0: Version described in specification version 0.11. 1: Version described in specification version 0.13. 15: Version not described in any available version of this specification. | R  | 1 |  
+
 ##### 2.4.5.3 Debug  Module Interface Access(dmi,0x11)
 
 The Debug Module is subordinate to a bus known as the Debug Module Interface (DMI). The master of this bus is the Debug Transport Module (DTM). The Debug Module Interface can be a simple bus with a master and a slave, or it can utilize a more comprehensive bus, such as TileLink or AMBA Advanced Peripheral Bus. The details are left to the system designer.
@@ -1388,7 +1420,8 @@ Field | Description | Access | Reset
 progbufsize | Size of the program buffer, represented in 32-bit words. Valid sizes range from 0 to 16. | R | Preset
 busy | 1: Indicates that an abstract command is currently being executed. This bit is set immediately when the command is written and is cleared only after the command has completed. | R/W | 0
 cmderr | Captures if an abstract command fails. The bits in this byte remain unchanged until they are cleared by writing 1 to them. No abstract command will be initiated until this value is reset to 0. This byte contains a valid value only when busy is 0. 0 (none): No error. 1 (busy): An abstract command is being executed when either command, abstractcs, or abstractauto is written, or when one of the data or program registers is read or written. This status can only be written when cmderr contains 0. 2 (not supported): The requested command is not supported, regardless of whether the hart is running or not. 3 (exception): An exception occurred during the execution of the command (e.g., while executing the program buffer). 4 (halt/resume): The abstract command cannot be executed because the hart is not in the required state (running/stopped) or is unavailable. 5 (bus): The abstract command failed due to a bus error (e.g., alignment, access size, or timeout). 7 (other): The command failed for other reasons. | R/W1C | 0
-datacount | The number of data registers implemented as part of the abstract command interface. Valid lengths range from 1 to 12. | R | Preset-
+datacount | The number of data registers implemented as part of the abstract command interface. Valid lengths range from 1 to 12. | R | Preset-  
+
 #### 2.4.6 Checklist  
 ### 2.5 QSPI    
 #### 2.5.1 QSPI Technical Specification  
@@ -1752,7 +1785,8 @@ Address | Result | Issue
 
 
 
-#### 2.5.4 Hardware Interfaces  
+#### 2.5.4 Hardware Interfaces    
+
 Signal | Direction | Description
 :-----------: | :-----------: | :-----------:
 spi_clk | output | Master Clock
@@ -2283,14 +2317,16 @@ The construction of Linux image files stored in an SD card is detailed in Sectio
 #### 3.6.2 Boot Mode Setup  
 The project currently supports two startup modes, namely starting from SD card and starting from IRAM, by binding the top-level signal DEBUG_MODE_SEL to the on-board DIP switch. If the signal is 0, it starts from the SD card boot program, and if the signal is 1, it starts from IRAM.  
 #### 3.6.3 Serial Terminal Setup  
-Open a terminal connection from the host to the MEISHAV100 VC707 FPGA development board using programs such as Minicom or Screen on Linux, or MobaXterm on Windows. Set the parameters as shown below.  
+Open a terminal connection from the host to the MEISHAV100 VC707 FPGA development board using programs such as Minicom or Screen on Linux, or MobaXterm on Windows. Set the parameters as shown below.    
+
   |Parameter|Value|  
   |:-:|:-:|  
   |Speed|115200|  
   |Parity|None|  
   |Data bits|8|  
   |Stop bits|1|  
-  |Hardware Flow|None|
+  |Hardware Flow|None|  
+  
 ### 3.7 Prototype Operation
 #### 3.7.1 Reset Sequence  
 After reset button is pushed, the signal is converted to an internal system reset with zero active level.  
